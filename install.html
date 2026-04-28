@@ -151,7 +151,7 @@
     const inputToken = document.getElementById('inputToken');
 
     // PERBAIKAN 1: Mengecek nama gembok yang benar
-    const isActivated = localStorage.getItem('sbs_active_status_STS-K4-S2-HOTS') === 'true';
+    const isActivated = localStorage.getItem('sbs_active_status_PSASP') === 'true';
 
     let fallbackTimeout;
     if (isActivated) {
@@ -180,21 +180,21 @@
         statusToken.innerHTML = "";
 
         // PERBAIKAN 2: Mengubah nama device ID agar spesifik
-        let deviceId = localStorage.getItem('sbs_device_id_STS-K4-S2-HOTS');
+        let deviceId = localStorage.getItem('sbs_device_id_PSASP');
         if (!deviceId) {
             deviceId = 'SBS-DEV-' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('sbs_device_id_STS-K4-S2-HOTS', deviceId);
+            localStorage.setItem('sbs_device_id_PSASP', deviceId);
         }
 
         const scriptUrl = "https://script.google.com/macros/s/AKfycbywKNk7bvnOVlTuH_r-cU5xHiDxqMP1vRuU-eY6Z9ayJ4-HvI8Y9gmAvoKifBtJ7_ycIg/exec"; 
 
         try {
-            // PERBAIKAN 3: Menambahkan parameter ?kelas=STS-K4-S2-HOTS di dalam fetch
-            const response = await fetch(`${scriptUrl}?kelas=STS-K4-S2-HOTS&token=${tokenValue}&deviceId=${deviceId}`);
+            // PERBAIKAN 3: Menambahkan parameter ?kelas=PSASP di dalam fetch
+            const response = await fetch(`${scriptUrl}?kelas=PSASP&token=${tokenValue}&deviceId=${deviceId}`);
             const result = await response.text();
 
             if (result === "ACTIVATED" || result === "SUCCESS") {
-                localStorage.setItem('sbs_active_status_STS-K4-S2-HOTS', 'true');
+                localStorage.setItem('sbs_active_status_PSASP', 'true');
                 statusToken.innerHTML = "Aktivasi Berhasil!";
                 statusToken.style.color = "#2ecc71";
                 
@@ -230,7 +230,7 @@
       promptInstalasi = e;
       
       // Mengecek ulang menggunakan gembok yang spesifik
-      if (localStorage.getItem('sbs_active_status_STS-K4-S2-HOTS') === 'true') {
+      if (localStorage.getItem('sbs_active_status_PSASP') === 'true') {
           clearTimeout(fallbackTimeout);
           pesanTunggu.style.display = 'none'; 
           tombolInstal.style.display = 'block'; 
