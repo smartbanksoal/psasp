@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instal Kuis Kelas</title>
+  
+  <link rel="manifest" href="./manifest.json">
+  
+  <style>
+    body { 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center; 
+      align-items: center; 
+      height: 100vh; 
+      background-color: #f4f7f6; 
+      font-family: sans-serif; 
+      margin: 0; 
+      text-align: center;
+    }
+    
+    .token-container {
+        background: white; padding: 30px; border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1); width: 85%; max-width: 350px;
+        margin-bottom: 20px; display: none; 
+    }
+    .token-container h3 { color: #2c3e50; margin-top: 0; margin-bottom: 10px; }
+    .token-container p { color: #7f8c8d; font-size: 14px; margin-bottom: 20px; }
+    .token-container input {
+        width: 85%; padding: 12px; border: 2px solid #bdc3c7;
+        border-radius: 8px; margin-bottom: 15px; font-size: 16px;
+        text-align: center; text-transform: uppercase; font-weight: bold;
+    }
+    .btn-validasi {
+        width: 100%; padding: 14px; background: #3498db; color: white;
+        border: none; border-radius: 8px; font-size: 16px; font-weight: bold;
+        cursor: pointer; transition: background 0.3s;
+    }
+    .btn-validasi:hover { background: #2980b9; }
+    .btn-validasi:disabled { background: #95a5a6; cursor: not-allowed; }
+    .status-token { margin-top: 15px; font-weight: bold; font-size: 14px; }
+
+    .btn-instal { 
+      display: none; 
+      background-color: #4CAF50; 
+      color: white; 
+      padding: 20px 40px; 
+      font-size: 24px; 
+      border: none; 
+      border-radius: 15px; 
+      cursor: pointer; 
+      box-shadow: 0 8px 15px rgba(0,0,0,0.2); 
+      font-weight: bold;
+      transition: transform 0.2s;
+    }
+
+    .btn-instal:active {
+      transform: scale(0.95); 
+    }
+
+    .pesan-tunggu { 
+      font-size: 18px; 
+      color: #666; 
+      margin-bottom: 20px;
+    }
+
+    #progress-container {
+        width: 80%;
+        max-width: 400px;
+        background-color: #e0e0e0;
+        border-radius: 20px;
+        display: none; 
+        overflow: hidden;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    #progress-bar {
+        width: 0%;
+        height: 25px;
+        background-color: #4CAF50;
+        border-radius: 20px;
+        text-align: center;
+        line-height: 25px;
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+        transition: width 0.1s; 
+    }
+
+    #pesan-sukses {
+        display: none; 
+        color: #4CAF50;
+        font-size: 22px;
+        font-weight: bold;
+    }
+    
+    #pesan-sukses span {
+        display: block;
+        margin-top: 10px;
+        font-size: 16px;
+        color: #555;
+        font-weight: normal;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="pesan-tunggu" id="pesan">⏳ Menyiapkan aplikasi...</div>
+
+  <div class="token-container" id="token-container">
+      <h3>Aktivasi SmartBankSoal</h3>
+      <p>Masukkan token lisensi Anda untuk menginstal aplikasi ini.</p>
+      <input type="text" id="inputToken" placeholder="SBS-XXXX" autocomplete="off">
+      <button class="btn-validasi" id="btnValidasi">Validasi Token</button>
+      <div id="statusToken" class="status-token"></div>
+  </div>
+  
+  <button class="btn-instal" id="tombol-instal">📥 Instal Aplikasi Sekarang</button>
+
+  <div class="pesan-tunggu" id="status-instalasi" style="display: none;">Memasang aplikasi, mohon tunggu...</div>
+  <div id="progress-container">
+      <div id="progress-bar">0%</div>
+  </div>
+
+  <div id="pesan-sukses">
+      ✅ Berhasil Diinstal! 
+      <span>Silakan buka aplikasi dari layar depan HP Anda.</span>
+  </div>
+
+  <script>
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+        window.location.href = 'index.html'; 
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js');
+    }
+
+    let promptInstalasi;
+    const tombolInstal = document.getElementById('tombol-instal');
+    const pesanTunggu = document.getElementById('pesan');
+    const progressContainer = document.getElementById('progress-container');
+    const progressBar = document.getElementById('progress-bar');
+    const statusInstalasi = document.getElementById('status-instalasi');
+    const pesanSukses = document.getElementById('pesan-sukses');
+    
+    const tokenContainer = document.getElementById('token-container');
+    const btnValidasi = document.getElementById('btnValidasi');
+    const statusToken = document.getElementById('statusToken');
+    const inputToken = document.getElementById('inputToken');
+
+    // PERBAIKAN 1: Mengecek nama gembok yang benar
+    const isActivated = localStorage.getItem('sbs_active_status_STS-K4-S2-HOTS') === 'true';
+
+    let fallbackTimeout;
+    if (isActivated) {
+        fallbackTimeout = setTimeout(() => {
+            pesanTunggu.innerText = 'Aplikasi sudah siap. Mengarahkan ke kuis...';
+            setTimeout(() => {
+                window.location.href = 'index.html'; 
+            }, 1000);
+        }, 3000);
+    } else {
+        pesanTunggu.style.display = 'none';
+        tokenContainer.style.display = 'block';
+    }
+
+    btnValidasi.addEventListener('click', async () => {
+        const tokenValue = inputToken.value.trim();
+
+        if (!tokenValue) {
+            statusToken.innerHTML = "Harap masukkan token!";
+            statusToken.style.color = "#e74c3c";
+            return;
+        }
+
+        btnValidasi.disabled = true;
+        btnValidasi.innerText = "Memvalidasi...";
+        statusToken.innerHTML = "";
+
+        // PERBAIKAN 2: Mengubah nama device ID agar spesifik
+        let deviceId = localStorage.getItem('sbs_device_id_STS-K4-S2-HOTS');
+        if (!deviceId) {
+            deviceId = 'SBS-DEV-' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('sbs_device_id_STS-K4-S2-HOTS', deviceId);
+        }
+
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbywKNk7bvnOVlTuH_r-cU5xHiDxqMP1vRuU-eY6Z9ayJ4-HvI8Y9gmAvoKifBtJ7_ycIg/exec"; 
+
+        try {
+            // PERBAIKAN 3: Menambahkan parameter ?kelas=STS-K4-S2-HOTS di dalam fetch
+            const response = await fetch(`${scriptUrl}?kelas=STS-K4-S2-HOTS&token=${tokenValue}&deviceId=${deviceId}`);
+            const result = await response.text();
+
+            if (result === "ACTIVATED" || result === "SUCCESS") {
+                localStorage.setItem('sbs_active_status_STS-K4-S2-HOTS', 'true');
+                statusToken.innerHTML = "Aktivasi Berhasil!";
+                statusToken.style.color = "#2ecc71";
+                
+                setTimeout(() => {
+                    tokenContainer.style.display = 'none';
+                    if (promptInstalasi) {
+                        tombolInstal.style.display = 'block';
+                    } else {
+                        pesanTunggu.style.display = 'block';
+                        pesanTunggu.innerText = 'Mengarahkan ke aplikasi...';
+                        setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+                    }
+                }, 1500);
+
+            } else if (result === "USED_OTHER_DEVICE") {
+                statusToken.innerHTML = "Token ini sudah dipakai di perangkat lain!";
+                statusToken.style.color = "#e74c3c";
+            } else {
+                statusToken.innerHTML = "Token tidak valid!";
+                statusToken.style.color = "#e74c3c";
+            }
+        } catch (error) {
+            statusToken.innerHTML = "Gagal terhubung ke server.";
+            statusToken.style.color = "#e67e22";
+        } finally {
+            btnValidasi.disabled = false;
+            btnValidasi.innerText = "Validasi Token";
+        }
+    });
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      promptInstalasi = e;
+      
+      // Mengecek ulang menggunakan gembok yang spesifik
+      if (localStorage.getItem('sbs_active_status_STS-K4-S2-HOTS') === 'true') {
+          clearTimeout(fallbackTimeout);
+          pesanTunggu.style.display = 'none'; 
+          tombolInstal.style.display = 'block'; 
+      }
+    });
+
+    tombolInstal.addEventListener('click', async () => {
+      if (promptInstalasi) {
+        promptInstalasi.prompt(); 
+        
+        const { outcome } = await promptInstalasi.userChoice;
+        
+        if (outcome === 'accepted') {
+          tombolInstal.style.display = 'none'; 
+          statusInstalasi.style.display = 'block'; 
+          progressContainer.style.display = 'block'; 
+          
+          let width = 0;
+          const interval = setInterval(() => {
+              if (width >= 100) {
+                  clearInterval(interval);
+                  progressContainer.style.display = 'none';
+                  statusInstalasi.style.display = 'none';
+                  pesanSukses.style.display = 'block';
+
+              } else {
+                  width++; 
+                  progressBar.style.width = width + '%';
+                  progressBar.innerHTML = width + '%';
+              }
+          }, 400); 
+          
+        }
+        promptInstalasi = null;
+      }
+    });
+  </script>
+
+</body>
+</html>

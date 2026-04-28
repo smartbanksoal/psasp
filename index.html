@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Kuis Interaktif</title>
+    <style>
+        /* Import Font dari Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
+
+        :root {
+            --primary: #4CAF50;
+            --blue: #2196F3;
+            --orange: #FF9800;
+            --text-dark: #333;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Latar Belakang Animasi Gradien Keren */
+        body {
+            background: linear-gradient(-45deg, #6a11cb, #2575fc, #00c6ff, #0072ff);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--white);
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Wadah Utama ala Glassmorphism */
+        .main-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        /* --- CSS UNTUK BANNER RESPONSIF --- */
+        .banner {
+            width: 100%;
+            height: auto; /* Gambar akan menyesuaikan proporsinya */
+            border-radius: 15px; 
+            margin-bottom: 25px; 
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        p.subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        /* Sistem Grid untuk Kartu Menu */
+        .grid-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
+            justify-items: center;
+        }
+
+        /* Desain Kartu (Tombol) Animasi */
+        .card {
+            background: var(--white);
+            color: var(--text-dark);
+            text-decoration: none;
+            width: 100%;
+            padding: 30px 20px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Efek Hover (Animasi Keren) */
+        .card:hover {
+            transform: translateY(-12px) scale(1.03);
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Garis warna di atas kartu */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+        }
+        
+        .card.indo::before { background: var(--blue); }
+        .card.mtk::before { background: var(--orange); }
+        .card.coming-soon::before { background: #9e9e9e; }
+
+        .card-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover .card-icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 40px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            text-align: center;
+        }
+
+        /* Responsif untuk HP */
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .main-container { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <img src="baner-sbs.png" alt="Banner Smart Bank Soal" class="banner">
+
+        <h1>Smart Bank Soal</h1>
+        <p class="subtitle">Pilih mata pelajaran untuk mulai mengerjakan kuis interaktif</p>
+
+        <div class="grid-menu">
+            
+            <a href="soal/PSASP-INDO-HOTS.html" class="card indo">
+                <div class="card-icon">📖</div>
+                <div class="card-title">Bahasa Indonesia</div>
+                <div class="card-desc">Latihan Soal HOTS PSASP</div>
+            </a>
+
+            <a href="soal/PSASP-MTK-HOTS.html" class="card mtk">
+                <div class="card-icon">🧮</div>
+                <div class="card-title">Matematika</div>
+                <div class="card-desc">Latihan Soal HOTS Kelas 6</div>
+            </a>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Dwi Endrasto. All Rights Reserved.</p>
+    </footer>
+
+</body>
+</html>

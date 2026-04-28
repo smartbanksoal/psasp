@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Matematika Kelas 6</title>
+    <style>
+        /* Desain Warna-warni dan Menarik */
+        :root {
+            --primary: #4CAF50;
+            --secondary: #FF9800;
+            --danger: #F44336;
+            --light: #F9F9F9;
+            --dark: #333;
+            --text-color: #2C3E50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            user-select: none; /* Anti copy paste */
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        /* Layar Login */
+        #login-screen {
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            width: 80%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: white;
+            transition: transform 0.2s, opacity 0.2s;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-start { background-color: var(--primary); }
+        .btn-home { background-color: #607D8B; }
+        .btn-nav { background-color: #2196F3; }
+        .btn-finish { background-color: var(--danger); }
+
+        /* Riwayat Login Screen */
+        .history-container {
+            margin-top: 30px;
+            text-align: left;
+            background: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        /* Area Kuis */
+        #quiz-screen { display: none; }
+        
+        .question-text {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .question-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .option-btn {
+            padding: 15px;
+            background: #f1f2f6;
+            border: 2px solid #dfe4ea;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: #eccc68;
+            border-color: #ffa502;
+        }
+
+        .option-btn.correct {
+            background: var(--primary) !important;
+            color: white !important;
+            border-color: var(--primary) !important;
+        }
+
+        .option-btn.wrong {
+            background: var(--danger) !important;
+            color: white !important;
+            border-color: var(--danger) !important;
+        }
+
+        .explanation {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-left: 5px solid #2196F3;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+        
+        .score-display {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+
+        /* Hasil Kuis */
+        #result-screen {
+            display: none;
+            text-align: center;
+        }
+
+        .final-score {
+            font-size: 4em;
+            color: var(--primary);
+            margin: 20px 0;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 0.9em;
+            color: #7f8c8d;
+            background: #fdfdfd;
+            border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+            .navigation { flex-direction: column; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header" id="main-header">
+        Kode Soal: PSASP-MTK-HOTS
+    </div>
+
+    <div class="content">
+        <div id="login-screen">
+            <h2>Selamat Datang di Kuis Merdeka</h2>
+            <p>Silakan masukkan data diri Anda untuk memulai.</p>
+            
+            <div class="input-group">
+                <input type="text" id="input-nama" placeholder="Nama Lengkap" required>
+            </div>
+            <div class="input-group">
+                <input type="text" id="input-kelas" placeholder="Kelas" required>
+            </div>
+            
+            <button class="btn btn-start" onclick="startQuiz()">Mulai Kuis</button>
+            <br>
+            <button class="btn btn-home" onclick="window.location.href='../index.html'">Kembali ke Home</button>
+
+            <div class="history-container">
+                <h3>Riwayat Pengerjaan Lokal</h3>
+                <ul id="local-history-list" style="list-style: none; padding: 0;">
+                    </ul>
+            </div>
+        </div>
+
+        <div id="quiz-screen">
+            <div class="question-text" id="question-text">Memuat pertanyaan...</div>
+            <img id="question-image" class="question-image" src="" alt="Ilustrasi Soal" style="display: none;">
+            
+            <div class="options-grid" id="options-container">
+                </div>
+
+            <div class="explanation" id="explanation-box">
+                <strong>Pembahasan:</strong> <span id="explanation-text"></span>
+            </div>
+
+            <div class="navigation">
+                <button class="btn btn-nav" id="btn-prev" onclick="changeQuestion(-1)">Sebelumnya</button>
+               <div class="score-display" style="display: none;">Skor: <span id="current-score">0</span></div>
+                <button class="btn btn-nav" id="btn-next" onclick="changeQuestion(1)">Selanjutnya</button>
+                <button class="btn btn-finish" id="btn-finish" onclick="finishQuiz()" style="display: none;">Selesai</button>
+            </div>
+            
+        </div>
+
+        <div id="result-screen">
+            <h2>Kuis Selesai!</h2>
+            <p>Terima kasih telah mengerjakan dengan jujur.</p>
+            <div class="final-score" id="final-score-display">0</div>
+            <button class="btn btn-home" onclick="location.reload()">Kembali ke Awal (Coba Lagi)</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2026 | Dwi Endrasto | dibuat dengan ❤️ untuk generasi cerdas bangsa. 
+    </div>
+</div>
+
+<script>
+    // PROTEKSI KEAMANAN
+    document.addEventListener('contextmenu', event => event.preventDefault()); // Anti Klik Kanan
+    document.addEventListener('copy', event => {
+        event.preventDefault(); // Anti Copy Paste
+        alert("Fitur copy dinonaktifkan demi integritas kuis.");
+    });
+
+    // DATABASE SOAL
+    const questionBank = [
+        {
+            type: "image",
+            imgPath: "gambar/kubus-balok.jpg", 
+            text: "Perhatikan gambar gabungan bangun ruang di atas! Volume total bangun tersebut adalah...",
+            options: ["Dua Ratus Kubik", "Tiga Ratus Kubik", "Empat Ratus Kubik", "Lima Ratus Kubik"], 
+            answerIndex: 1, 
+            explanation: "Bangun tersebut terdiri dari balok (P=10, L=5, T=4) volume 200 dan kubus (S=5) volume 125. Namun karena ada irisan, volume bersih dihitung ulang menjadi tiga ratus sentimeter kubik."
+        },
+        {
+            type: "image",
+            imgPath: "gambar/diagram-batang.jpg",
+            text: "Berdasarkan diagram batang hasil panen di atas, selisih hasil panen padi dan jagung adalah...",
+            options: ["Satu Ton Beras", "Dua Ton Beras", "Tiga Ton Beras", "Empat Ton Beras"],
+            answerIndex: 1,
+            explanation: "Tinggi batang padi berada di angka 8 ton, sedangkan jagung berada di angka 6 ton. Selisihnya adalah 8 - 6 = 2 ton."
+        },
+        {
+            type: "image",
+            imgPath: "gambar/pizza-pecahan.jpg",
+            text: "Potongan pizza pada gambar menunjukkan nilai pecahan yang ekuivalen dengan bentuk desimal...",
+            options: ["Nol Koma Dua", "Nol Koma Tiga", "Nol Koma Lima", "Nol Koma Enam"],
+            answerIndex: 2,
+            explanation: "Gambar menunjukkan 4 potong pizza dari total 8 potong yang utuh. Pecahan 4/8 disederhanakan menjadi 1/2, yang dalam desimal adalah 0,5."
+        },
+        {
+            type: "image",
+            imgPath: "gambar/peta-koordinat.jpg",
+            text: "Posisi rumah sakit terhadap sekolah pada sistem berpetak di atas menunjukkan jarak horizontal dan vertikal sejauh...",
+            options: ["Tiga Dan Empat", "Empat Dan Tiga", "Dua Dan Lima", "Lima Dan Dua"],
+            answerIndex: 0,
+            explanation: "Dari titik sekolah (2,1) ke rumah sakit (5,5), pergerakan horizontal (sumbu x) adalah 3 satuan ke kanan, dan vertikal (sumbu y) adalah 4 satuan ke atas."
+        },
+        {
+            type: "image",
+            imgPath: "gambar/bangun-datar.jpg",
+            text: "Luas daerah yang diarsir pada gabungan bangun datar tersebut adalah...",
+            options: ["Seratus Persegi Pas", "Dua Ratus Persegi", "Tiga Ratus Persegi", "Empat Ratus Persegi"],
+            answerIndex: 1,
+            explanation: "Luas persegi panjang besar adalah 300, dikurangi luas segitiga yang tidak diarsir yaitu 100. Hasilnya 200 satuan luas."
+        },
+        {
+            type: "text",
+            text: "Hasil dari operasi hitung campuran 25.000 + 15.000 x 2 - 10.000 adalah...",
+            options: ["Empat Puluh Ribu", "Lima Puluh Ribu", "Empat Lima Ribu", "Tiga Puluh Ribu"],
+            answerIndex: 0,
+            explanation: "Kerjakan perkalian terlebih dahulu: 15.000 x 2 = 30.000. Kemudian jumlahkan: 25.000 + 30.000 = 55.000. Kurangi: 55.000 - 10.000 = 45.000."
+        },
+        {
+            type: "text",
+            text: "KPK dari 12, 18, dan 24 dalam bentuk faktorisasi prima adalah...",
+            options: ["Dua Dan Tiga", "Pangkat Dan Kali", "Tujuh Puluh Dua", "Delapan Puluh Dua"], 
+            answerIndex: 2,
+            explanation: "Faktorisasi: 12 = 2²x3, 18 = 2x3², 24 = 2³x3. KPK = 2³ x 3² = 8 x 9 = 72."
+        },
+        {
+            type: "text",
+            text: "Sebuah kantong berisi kelereng. Peluang terambilnya kelereng merah muda jika total kelereng 10 dan kelereng merah muda 2 adalah...",
+            options: ["Satu Per Lima", "Satu Per Dua", "Dua Per Tiga", "Tiga Per Empat"],
+            answerIndex: 0,
+            explanation: "Rumus peluang = n(A)/n(S) = 2/10. Disederhanakan menjadi 1/5."
+        },
+        {
+            type: "text",
+            text: "Perbandingan kelereng Andi dan Budi adalah 3 : 5. Jika jumlah kelereng mereka 40, selisihnya adalah...",
+            options: ["Lima Belas Buah", "Dua Puluh Buah", "Sepuluh Biji Pas", "Delapan Biji Pas"],
+            answerIndex: 2,
+            explanation: "Jumlah perbandingan = 8. Selisih perbandingan = 2. Selisih kelereng = (2/8) x 40 = 10."
+        },
+        {
+            type: "text",
+            text: "Sudut yang terbentuk dari putaran jarum jam pada pukul 03.00 memiliki jenis sudut...",
+            options: ["Sudut Siku Siku", "Sudut Tumpul Pas", "Sudut Lancip Pas", "Sudut Lurus Pas"],
+            answerIndex: 0,
+            explanation: "Pukul 03.00 membentuk sudut tepat 90 derajat, yang merupakan sudut siku-siku."
+        },
+        {
+            type: "text",
+            text: "Ibu membeli gula seberat 1,5 kg dan tepung seberat 1 1/4 kg. Pernyataan yang benar mengenai berat kedua bahan tersebut adalah...",
+            options: ["Tepung Lebih Berat", "Keduanya Sama Berat", "Gula Lebih Berat", "Tidak Bisa Diukur"],
+            answerIndex: 2,
+            explanation: "Bentuk desimal dari 1 1/4 adalah 1,25 kg. Karena 1,5 kg lebih besar dari 1,25 kg, maka gula lebih berat."
+        },
+        {
+            type: "text",
+            text: "Lampu A menyala setiap 15 detik dan lampu B setiap 20 detik. Jika keduanya menyala bersamaan di awal, mereka akan menyala bersama lagi pada detik ke-...",
+            options: ["Tiga Puluh Detik", "Enam Puluh Detik", "Empat Puluh Detik", "Lima Puluh Detik"],
+            answerIndex: 1,
+            explanation: "Masalah ini diselesaikan dengan KPK. Kelipatan Persekutuan Terkecil dari 15 dan 20 adalah 60. Mereka menyala bersama pada detik ke-60."
+        },
+        {
+            type: "text",
+            text: "Setiap hari matahari selalu terbit dari sebelah timur. Dalam matematika peluang, kejadian ini masuk ke dalam kategori...",
+            options: ["Belum Tentu Terjadi", "Mungkin Akan Terjadi", "Mustahil Akan Terjadi", "Pasti Akan Terjadi"],
+            answerIndex: 3,
+            explanation: "Matahari selalu terbit dari timur adalah sebuah kepastian absolut. Nilai peluang kejadian pasti adalah mutlak 1."
+        },
+        {
+            type: "text",
+            text: "Dalam keranjang terdapat 12 mangga dan 18 apel. Perbandingan paling sederhana mangga terhadap keseluruhan buah di keranjang adalah...",
+            options: ["Dua Banding Tiga", "Dua Banding Lima", "Tiga Banding Lima", "Satu Banding Dua"],
+            answerIndex: 1,
+            explanation: "Total buah = 12 + 18 = 30. Rasio mangga : total buah adalah 12 : 30. Jika disederhanakan (dibagi 6) menjadi 2 : 5."
+        },
+        {
+            type: "text",
+            text: "Bangun ruang ini memiliki 6 sisi berbentuk persegi yang sama luas, 12 rusuk sama panjang, dan 8 titik sudut. Bangun tersebut adalah...",
+            options: ["Bangun Balok Panjang", "Bangun Prisma Segitiga", "Bangun Kubus Sempurna", "Bangun Limas Segiempat"],
+            answerIndex: 2,
+            explanation: "Sifat 6 sisi persegi yang identik, 12 rusuk sama panjang, dan 8 titik sudut merupakan ciri khas dari bangun ruang kubus."
+        },
+        {
+            type: "text",
+            text: "Andi memiliki uang Rp50.000. Ia membeli buku tulis seharga Rp25.500 dan pensil Rp4.500. Sisa uang saku Andi sekarang adalah...",
+            options: ["Tiga Puluh Ribu", "Lima Puluh Ribu", "Empat Puluh Ribu", "Dua Puluh Ribu"],
+            answerIndex: 3,
+            explanation: "Total pengeluaran = Rp25.500 + Rp4.500 = Rp30.000. Sisa uang = Rp50.000 - Rp30.000 = Rp20.000."
+        },
+        {
+            type: "text",
+            text: "Sebuah taman berbentuk segitiga memiliki panjang alas 12 meter dan tinggi 8 meter. Luas taman tersebut adalah...",
+            options: ["Sembilan Puluh Enam", "Empat Puluh Delapan", "Tiga Puluh Enam", "Dua Puluh Empat"],
+            answerIndex: 1,
+            explanation: "Rumus luas segitiga = 1/2 x alas x tinggi = 1/2 x 12 x 8 = 48 meter persegi."
+        },
+        {
+            type: "text",
+            text: "Sudut yang besarnya lebih dari 90 derajat tetapi ukurannya kurang dari 180 derajat disebut sebagai...",
+            options: ["Termasuk Sudut Tumpul", "Termasuk Sudut Lancip", "Termasuk Sudut Lurus", "Termasuk Sudut Siku"],
+            answerIndex: 0,
+            explanation: "Sudut lancip < 90, siku-siku = 90, tumpul berada di antara 90 dan 180 derajat, sedangkan sudut lurus tepat 180 derajat."
+        },
+        {
+            type: "text",
+            text: "Sebuah dadu standar bersisi enam dilempar satu kali. Nilai peluang munculnya mata dadu bernilai bilangan genap adalah...",
+            options: ["Empat Per Enam", "Dua Per Enam", "Tiga Per Enam", "Satu Per Enam"],
+            answerIndex: 2,
+            explanation: "Angka genap pada dadu ada tiga yaitu 2, 4, dan 6. Total sisi ada enam. Peluangnya adalah 3/6."
+        },
+        {
+            type: "text",
+            text: "Satu langkah ke kanan bernilai positif, ke kiri bernilai negatif. Jika posisi awal di angka 2 lalu melangkah ke kiri 5 kali, maka berada di...",
+            options: ["Posisi Positif Tiga", "Posisi Negatif Tiga", "Posisi Negatif Tujuh", "Posisi Positif Tujuh"],
+            answerIndex: 1,
+            explanation: "Awal dari 2. Bergerak ke kiri 5 langkah sama dengan dikurangi 5. Hasilnya: 2 - 5 = -3 (Negatif 3)."
+        },
+        {
+            type: "text",
+            text: "Berapakah hasil akhir dari perkalian antara pecahan dua pertiga (2/3) jika dikalikan dengan bilangan asli 12?",
+            options: ["Tepat Sembilan Bulat", "Tepat Enam Bulat", "Tepat Empat Bulat", "Tepat Delapan Bulat"],
+            answerIndex: 3,
+            explanation: "Penyelesaian perkalian: (2/3) x 12 = 24 / 3 = 8."
+        },
+        {
+            type: "text",
+            text: "Perbandingan umur Ani dan Budi adalah 4 banding 5. Jika kedua rasio tersebut digandakan menjadi dua kali lipat, maka perbandingannya senilai dengan...",
+            options: ["Sepuluh Banding Delapan", "Dua Banding Tiga", "Delapan Banding Sepuluh", "Tiga Banding Dua"],
+            answerIndex: 2,
+            explanation: "Rasio senilai didapatkan dengan mengalikan sisi-sisinya dengan bilangan yang sama. 4x2=8 dan 5x2=10, sehingga menjadi 8:10."
+        },
+        {
+            type: "text",
+            text: "Berdasarkan letaknya, urutan bilangan desimal 0,5 ; 0,2 ; 0,8 mulai dari yang terkecil nilainya menuju yang paling besar adalah...",
+            options: ["Delapan Lima Dua", "Dua Lima Delapan", "Lima Dua Delapan", "Dua Delapan Lima"],
+            answerIndex: 1,
+            explanation: "Dilihat dari angka di belakang koma, urutan dari yang paling kecil nilainya adalah 0,2 lalu 0,5 dan terakhir 0,8."
+        },
+        {
+            type: "text",
+            text: "Perhatikan bilangan ratusan ribu berikut: 745.892. Pada urutan tersebut, angka 4 menempati nilai tempat sebagai...",
+            options: ["Posisi Puluh Ribuan", "Posisi Ratus Ribuan", "Posisi Ribuan Saja", "Posisi Ratusan Saja"],
+            answerIndex: 0,
+            explanation: "Angka 7 adalah ratus ribuan, angka 4 adalah puluh ribuan (40.000), 5 ribuan, 8 ratusan, 9 puluhan, dan 2 satuan."
+        },
+        {
+            type: "text",
+            text: "Ibu membagikan 24 permen dan 36 cokelat kepada anak-anak sama rata. Jumlah maksimal anak yang menerima pembagian tanpa sisa adalah...",
+            options: ["Sebanyak Dua Puluh", "Sebanyak Enam Belas", "Sebanyak Delapan Belas", "Sebanyak Dua Belas"],
+            answerIndex: 3,
+            explanation: "Gunakan FPB. Faktor Persekutuan Terbesar dari 24 dan 36 adalah 12. Ibu bisa membagi rata kepada maksimal 12 anak."
+        },
+        {
+            type: "text",
+            text: "Sebuah kantong berisi 3 kelereng merah dan 7 kelereng biru. Kejadian terambilnya kelereng merah dibanding kelereng biru merupakan jenis...",
+            options: ["Peluang Sangat Setara", "Peluang Pasti Setara", "Peluang Tidak Setara", "Peluang Sama Rata"],
+            answerIndex: 2,
+            explanation: "Karena jumlah kedua warna kelereng berbeda (3 dan 7), probabilitas terambilnya kelereng tersebut tidak setara (peluang terambil biru lebih besar)."
+        },
+        {
+            type: "text",
+            text: "Berapa keliling utuh dari sebuah bangun persegi panjang yang memiliki ukuran panjang sisi 15 cm dan lebar sisi 10 cm?",
+            options: ["Empat Puluh Senti", "Lima Puluh Senti", "Tiga Puluh Senti", "Dua Puluh Senti"],
+            answerIndex: 1,
+            explanation: "Keliling persegi panjang = 2 x (panjang + lebar) = 2 x (15 + 10) = 2 x 25 = 50 cm."
+        },
+        {
+            type: "text",
+            text: "Apabila sebuah balok memiliki panjang 8 cm, lebar 5 cm, dan ketebalan atau tinggi 2 cm. Volume total balok tersebut adalah...",
+            options: ["Delapan Puluh Kubik", "Empat Puluh Kubik", "Enam Puluh Kubik", "Lima Puluh Kubik"],
+            answerIndex: 0,
+            explanation: "Volume balok dihitung dengan rumus p x l x t. Yaitu 8 x 5 x 2 = 80 centimeter kubik."
+        },
+        {
+            type: "text",
+            text: "Berapakah hasil dari operasi hitung pengurangan bilangan cacah antara nilai 75.000 apabila dikurangi dengan bilangan 25.000?",
+            options: ["Enam Puluh Ribu", "Empat Puluh Ribu", "Tiga Puluh Ribu", "Lima Puluh Ribu"],
+            answerIndex: 3,
+            explanation: "Pengurangan bersusun secara langsung: 75.000 - 25.000 hasilnya adalah 50.000."
+        },
+        {
+            type: "text",
+            text: "Rata-rata panen padi 4 bulan adalah 50 ton. Panen bulan pertama hingga ketiga berturut-turut 40, 50, dan 60 ton. Panen bulan keempat adalah...",
+            options: ["Empat Puluh Ton", "Enam Puluh Ton", "Lima Puluh Ton", "Tiga Puluh Ton"],
+            answerIndex: 2,
+            explanation: "Total panen 4 bulan = rata-rata (50) x 4 = 200 ton. Bulan keempat = 200 - (40+50+60) = 200 - 150 = 50 ton."
+        },
+        {
+            type: "text",
+            text: "Andi mulai membuka buku belajar pukul 18.30 dan menyelesaikan tugasnya tepat pukul 20.00. Durasi belajar Andi menghabiskan waktu selama...",
+            options: ["Dua Setengah Jam", "Satu Setengah Jam", "Tiga Setengah Jam", "Empat Setengah Jam"],
+            answerIndex: 1,
+            explanation: "Dari jam 18.30 ke 19.30 adalah 1 jam (60 menit). Ditambah sisa ke jam 20.00 yakni 30 menit. Totalnya adalah 1,5 jam."
+        },
+        {
+            type: "text",
+            text: "Analisislah pola bilangan berikut yang membesar secara perkalian: 2, 6, 18, 54, ... Nilai angka yang tepat untuk urutan selanjutnya adalah...",
+            options: ["Satu Enam Dua", "Satu Lima Dua", "Satu Tujuh Dua", "Satu Delapan Dua"],
+            answerIndex: 0,
+            explanation: "Pola bilangan ini berkembang dengan cara dikalikan angka 3 setiap urutannya. Maka selanjutnya 54 x 3 = 162."
+        },
+        {
+            type: "text",
+            text: "Satu paket berisi 3 buku dijual Rp15.000. Jika Rini berniat membeli 5 buah buku satuan yang sama persis, harga totalnya adalah...",
+            options: ["Dua Puluh Ribu", "Tiga Puluh Ribu", "Dua Puluh Lima", "Tiga Puluh Lima"],
+            answerIndex: 2,
+            explanation: "Gunakan rasio proporsi. Harga per buku = Rp15.000 dibagi 3 = Rp5.000. Maka 5 buku = 5 x Rp5.000 = Rp25.000."
+        },
+        {
+            type: "text",
+            text: "Di dalam sakunya, Budi menyimpan 3 lembar uang dua puluhan ribu dan 4 keping uang logam lima ratusan. Jumlah hartanya bernilai...",
+            options: ["Enam Puluh Dua", "Enam Puluh Ribu", "Lima Puluh Dua", "Lima Puluh Ribu"],
+            answerIndex: 0,
+            explanation: "Pecahan kertas: 3 x 20.000 = 60.000. Koin logam: 4 x 500 = 2.000. Total keseluruhan 62.000 rupiah."
+        },
+        {
+            type: "text",
+            text: "Nilai bilangan yang paling tepat untuk melengkapi operasi hitung pada kalimat matematika 15 x ... = 150 agar bernilai benar adalah...",
+            options: ["Hanya Angka Sebelas", "Hanya Angka Sembilan", "Hanya Angka Delapan", "Hanya Angka Sepuluh"],
+            answerIndex: 3,
+            explanation: "Untuk mengisi bagian rumpang pada perkalian, bagi hasil akhirnya: 150 dibagi 15 hasilnya sama dengan 10."
+        }
+
+    ];
+
+    // VARIABEL STATE LOKAL
+    let currentUser = { nama: "", kelas: "" };
+    let randomizedQuestions = [];
+    let currentQuestionIndex = 0;
+    let scoreCounter = 0;
+    let answeredQuestions = [];
+
+    // INISIALISASI HALAMAN
+    document.addEventListener('DOMContentLoaded', loadLocalHistory);
+
+    // FUNGSI ACAK
+    function shuffleArray(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    // MEMULAI KUIS
+    function startQuiz() {
+        const nama = document.getElementById('input-nama').value.trim();
+        const kelas = document.getElementById('input-kelas').value.trim();
+
+        if (nama === "" || kelas === "") {
+            alert("Harap isi Nama dan Kelas terlebih dahulu!");
+            return;
+        }
+
+        currentUser = { nama, kelas };
+
+        scoreCounter = 0;
+        currentQuestionIndex = 0;
+        answeredQuestions = new Array(questionBank.length).fill(false);
+        document.getElementById('current-score').innerText = 0;
+
+        randomizedQuestions = shuffleArray([...questionBank]);
+
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('quiz-screen').style.display = 'block';
+
+        renderQuestion();
+    }
+
+    // RENDER PERTANYAAN
+    function renderQuestion() {
+        const q = randomizedQuestions[currentQuestionIndex];
+        const hasAnswered = answeredQuestions[currentQuestionIndex];
+
+        document.getElementById('question-text').innerText = `Soal ${currentQuestionIndex + 1}: ${q.text}`;
+        
+        const imgEl = document.getElementById('question-image');
+        if (q.type === 'image' && q.imgPath) {
+            imgEl.src = q.imgPath;
+            imgEl.style.display = 'block';
+        } else {
+            imgEl.style.display = 'none';
+        }
+
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+        
+        let mappedOptions = q.options.map((opt, index) => ({ text: opt, isCorrect: index === q.answerIndex }));
+        
+        if (!hasAnswered) {
+            mappedOptions = shuffleArray(mappedOptions);
+            q.shuffledOptionsCache = mappedOptions;
+        } else {
+            mappedOptions = q.shuffledOptionsCache;
+        }
+
+        mappedOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt.text;
+            
+            if (hasAnswered) {
+                btn.disabled = true;
+                if (opt.isCorrect) btn.classList.add('correct');
+                else if (q.userSelectedText === opt.text) btn.classList.add('wrong');
+            } else {
+                btn.onclick = () => selectAnswer(btn, opt, q);
+            }
+            optionsContainer.appendChild(btn);
+        });
+
+        const explanationBox = document.getElementById('explanation-box');
+        if (hasAnswered) {
+            document.getElementById('explanation-text').innerText = q.explanation;
+            explanationBox.style.display = 'block';
+        } else {
+            explanationBox.style.display = 'none';
+        }
+
+        document.getElementById('btn-prev').style.display = currentQuestionIndex === 0 ? 'none' : 'inline-block';
+        
+        if (currentQuestionIndex === randomizedQuestions.length - 1) {
+            document.getElementById('btn-next').style.display = 'none';
+            document.getElementById('btn-finish').style.display = 'inline-block';
+        } else {
+            document.getElementById('btn-next').style.display = 'inline-block';
+            document.getElementById('btn-finish').style.display = 'none';
+        }
+    }
+
+    // PILIH JAWABAN
+    function selectAnswer(btnElement, selectedOption, questionObj) {
+        if (answeredQuestions[currentQuestionIndex]) return;
+
+        questionObj.userSelectedText = selectedOption.text;
+        answeredQuestions[currentQuestionIndex] = true;
+
+        const allButtons = document.querySelectorAll('.option-btn');
+        allButtons.forEach(btn => {
+            btn.disabled = true;
+            if (btn.innerText === questionObj.shuffledOptionsCache.find(o => o.isCorrect).text) {
+                btn.classList.add('correct');
+            }
+        });
+
+        if (selectedOption.isCorrect) {
+            scoreCounter++;
+        } else {
+            btnElement.classList.add('wrong');
+        }
+
+        document.getElementById('explanation-text').innerText = questionObj.explanation;
+        document.getElementById('explanation-box').style.display = 'block';
+
+        updateScoreDisplay();
+    }
+
+    // UPDATE SKOR
+    function updateScoreDisplay() {
+        let percentage = (scoreCounter / randomizedQuestions.length) * 100;
+        let safeScore = Math.min(100, Math.round(percentage));
+        document.getElementById('current-score').innerText = safeScore;
+    }
+
+    // NAVIGASI DENGAN VALIDASI WAJIB JAWAB
+    function changeQuestion(step) {
+        // Blokir jika pengguna menekan "Selanjutnya" tapi belum memilih jawaban
+        if (step > 0 && !answeredQuestions[currentQuestionIndex]) {
+            alert("Silakan pilih jawaban terlebih dahulu sebelum melanjutkan ke soal berikutnya!");
+            return;
+        }
+
+        currentQuestionIndex += step;
+        renderQuestion();
+    }
+
+    // SELESAIKAN KUIS DENGAN VALIDASI
+   function finishQuiz() {
+    // Blokir jika pengguna menekan "Selesai" di soal terakhir tapi belum dijawab
+    if (!answeredQuestions[currentQuestionIndex]) {
+        alert("Silakan pilih jawaban terlebih dahulu sebelum mengakhiri kuis!");
+        return;
+    }
+
+    const btnFinish = document.getElementById('btn-finish');
+    btnFinish.innerText = "Menyimpan Data...";
+    btnFinish.disabled = true;
+
+    // Hitung persentase dan batasi skor maksimal 100 untuk mencegah anomali data
+    let percentage = (scoreCounter / randomizedQuestions.length) * 100;
+    let finalScore = Math.min(100, Math.round(percentage)); 
+
+    // 1. SIMPAN KE RIWAYAT LOKAL (Agar siswa bisa melihat riwayatnya)
+    const dataKuis = JSON.parse(localStorage.getItem('dataKuis')) || [];
+    const now = new Date();
+    const waktuStr = `${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}`;
+    
+    dataKuis.push({
+        nama: currentUser.nama,
+        kelas: currentUser.kelas,
+        mapel: "Matematika",
+        nilai: finalScore,
+        waktu: waktuStr
+    });
+    localStorage.setItem('dataKuis', JSON.stringify(dataKuis));
+
+    // 2. KIRIM DATA KE GOOGLE SHEETS GURU
+    // Ganti teks di bawah ini dengan URL Web App dari Google Apps Script Bapak
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwzCsI_5uv5jreQHSiNW5Dej7Iu-5Sui0uYhwIWGFwcsm8kM09C20JMwjDO8ZZRMGAs/exec'; 
+    
+    const payload = {
+        nama: currentUser.nama,
+        kelas: currentUser.kelas,
+        mapel: "Matematika",
+        nilai: finalScore
+    };
+
+    fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    })
+    .then(response => {
+        // Tampilkan layar hasil jika berhasil terkirim
+        tampilkanLayarHasil(finalScore);
+    })
+    .catch(error => {
+        // Jika internet siswa bermasalah, tetap tampilkan hasil dari perhitungan lokal
+        console.error("Gagal mengirim ke server guru:", error);
+        alert("Pemberitahuan: Skor Anda tersimpan di perangkat, namun koneksi ke server guru sedang terganggu.");
+        tampilkanLayarHasil(finalScore);
+    });
+}
+
+// Fungsi bantuan untuk menampilkan layar hasil
+function tampilkanLayarHasil(skor) {
+    document.getElementById('quiz-screen').style.display = 'none';
+    document.getElementById('result-screen').style.display = 'block';
+    document.getElementById('final-score-display').innerText = skor;
+    
+    const btnFinish = document.getElementById('btn-finish');
+    btnFinish.innerText = "Selesai";
+    btnFinish.disabled = false;
+}
+
+    // LOAD RIWAYAT LOKAL
+    function loadLocalHistory() {
+        const dataKuis = JSON.parse(localStorage.getItem('dataKuis')) || [];
+        const list = document.getElementById('local-history-list');
+        list.innerHTML = "";
+
+        if (dataKuis.length === 0) {
+            list.innerHTML = "<li>Belum ada riwayat pengerjaan.</li>";
+            return;
+        }
+
+        const recentData = dataKuis.slice(-5).reverse(); 
+        recentData.forEach(item => {
+            const li = document.createElement('li');
+            li.style.borderBottom = "1px solid #ddd";
+            li.style.padding = "8px 0";
+            li.innerHTML = `<strong>${item.nama}</strong> (Kelas ${item.kelas}) - Skor: <strong style="color:var(--primary)">${item.nilai}</strong> <br><small style="color:#777">${item.waktu}</small>`;
+            list.appendChild(li);
+        });
+    }
+</script>
+
+</body>
+</html>
