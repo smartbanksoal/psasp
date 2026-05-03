@@ -1,5 +1,5 @@
 // Nama cache versi (Naikkan versinya ke v2, v3, dst. jika nanti ada perubahan file)
-const CACHE_NAME = 'psasp-v1';
+const CACHE_NAME = 'psasp-v2';
 
 const urlsToCache = [
   './',
