@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif: PSASP-IPAS-HOTS</title>
+    <style>
+        /* CSS & Tampilan Umum */
+        :root {
+            --primary: #4CAF50;
+            --secondary: #2196F3;
+            --background: #f4f7f6;
+            --text: #333;
+            --correct: #4CAF50;
+            --wrong: #f44336;
+            --header-bg: #ff9800;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Proteksi Anti Copy Paste */
+            user-select: none; 
+            -webkit-user-select: none;
+            -moz-user-select: none;
+        }
+
+        body {
+            background-color: var(--background);
+            background-image: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header, footer {
+            width: 100%;
+            text-align: center;
+            padding: 15px;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header {
+            background: linear-gradient(90deg, #ff9800, #ff5722);
+            font-size: 1.2rem;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        footer {
+            background: #333;
+            font-size: 0.9rem;
+            margin-top: auto;
+            letter-spacing: 0.5px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: white;
+            margin: 20px auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .login-screen h2 {
+            text-align: center;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        input {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--secondary);
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.1s, opacity 0.3s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .btn-start { background-color: var(--primary); }
+        .btn-home { background-color: #607D8B; margin-bottom: 20px; }
+        
+        /* Riwayat Skor Login Screen */
+        .history-box {
+            margin-top: 20px;
+            border-top: 2px dashed #ddd;
+            padding-top: 20px;
+        }
+        
+        .history-item {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            border-left: 4px solid var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Quiz Area */
+        .quiz-screen {
+            display: none;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-weight: bold;
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 8px;
+            color: #1565c0;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .question-image {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: block;
+            border: 2px solid #eee;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background-color: #f1f1f1;
+            color: #333;
+            text-align: left;
+            padding: 15px;
+            border: 2px solid transparent;
+        }
+
+        .option-btn.correct {
+            background-color: var(--correct);
+            color: white;
+            border-color: #388E3C;
+        }
+
+        .option-btn.wrong {
+            background-color: var(--wrong);
+            color: white;
+            border-color: #D32F2F;
+        }
+
+        .explanation-box {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff3e0;
+            border-left: 5px solid #ff9800;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .nav-btn { background-color: var(--secondary); display: none; }
+        .finish-btn { background-color: var(--primary); display: none; width: 100%; }
+
+        /* Tampilan Profil User yang Keren */
+        .user-profile-bar {
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+        }
+        .user-profile-bar .badge-kelas {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            backdrop-filter: blur(5px);
+        }
+
+    </style>
+</head>
+<body oncontextmenu="return false;"> <!-- Proteksi Klik Kanan -->
+
+    <header>Kode Soal: PSASP-IPAS-HOTS</header>
+
+    <div class="container" id="loginArea">
+        <div class="login-screen">
+            <h2>Selamat Datang</h2>
+            <button class="btn-home" onclick="window.location.href='../index.html'">🏠 Kembali ke Home Utama</button>
+            <input type="text" id="namaSiswa" placeholder="Masukkan Nama Lengkap" required>
+            <input type="text" id="kelasSiswa" placeholder="Masukkan Kelas" required>
+            <button class="btn-start" onclick="mulaiKuis()">Mulai Kuis Sekarang</button>
+        </div>
+
+        <div class="history-box">
+            <h3>Riwayat Skor Anda (Lokal)</h3>
+            <div id="riwayatLokal">Belum ada riwayat pengerjaan.</div>
+        </div>
+    </div>
+
+    <div class="container quiz-screen" id="quizArea">
+        
+        <!-- Profile Bar Keren yang Baru -->
+        <div class="user-profile-bar" id="profilPesertaBox">
+            <span id="teksNama">👤 Memuat Nama...</span>
+            <span class="badge-kelas" id="teksKelas">Kelas: -</span>
+        </div>
+
+        <div class="status-bar">
+            <span id="soalCounter">Soal: 1 / 35</span>
+            <span id="liveScore">Skor Sementara: 0</span>
+        </div>
+        
+        <!-- Area Soal -->
+        <div id="soalContainer"></div>
+        
+        <!-- Pembahasan -->
+        <div class="explanation-box" id="pembahasanContainer"></div>
+
+        <!-- Navigasi -->
+        <div class="nav-buttons">
+            <button class="nav-btn" id="btnNext" onclick="soalSelanjutnya()">Soal Selanjutnya ➔</button>
+        </div>
+        <button class="finish-btn" id="btnSelesai" onclick="selesaiKuis()">Selesai & Simpan Nilai</button>
+    </div>
+
+    <footer>Oleh : Dwi Endrasto - hak cipta dilindungi | Dibuat dengan ❤️ untuk generasi cerdas bangsa.</footer>
+
+    <script>
+        // DATA SOAL (35 Soal Kisi-Kisi)
+        // Ketentuan: 5 Soal Bergambar Rasio 4:3, Jawaban Kata Sama Jumlahnya, Diacak
+        const bankSoal = [
+            {
+                // 1. Mata (HOTS Bergambar)
+                pertanyaan: "Perhatikan gambar anatomi mata di bawah ini! Bagian yang ditunjuk oleh nomor 1 berfungsi secara khusus untuk...",
+                gambar: "gambar/mata_4x3.jpg", // Ganti path dengan gambar rasio 4:3 milik Anda
+                pilihan: [
+                    "Mengatur jumlah cahaya",
+                    "Meneruskan jalan cahaya",
+                    "Memfokuskan arah cahaya",
+                    "Menangkap bayangan cahaya"
+                ],
+                jawabanBenar: 0,
+                pembahasan: "Iris berfungsi mengatur jumlah cahaya yang masuk ke mata dengan mengubah ukuran pupil."
+            },
+            {
+                // 2. Lapisan Atmosfer
+                pertanyaan: "Lapisan atmosfer ini melindungi bumi dari jatuhnya meteor dan benda langit lainnya. Lapisan yang dimaksud adalah...",
+                pilihan: [
+                    "Lapisan bawah troposfer",
+                    "Lapisan tengah mesosfer",
+                    "Lapisan atas termosfer",
+                    "Lapisan luar eksosfer"
+                ],
+                jawabanBenar: 1,
+                pembahasan: "Mesosfer adalah lapisan atmosfer yang berfungsi membakar meteor yang menuju ke Bumi."
+            },
+            {
+                // 3. Pernapasan
+                pertanyaan: "Seseorang mengalami sesak napas karena penyempitan saluran pernapasan akibat alergi debu. Gangguan tersebut dinamakan...",
+                pilihan: [
+                    "Penyakit asma bronkial",
+                    "Penyakit flu menular",
+                    "Penyakit tuberkulosis paru",
+                    "Penyakit bronkitis akut"
+                ],
+                jawabanBenar: 0,
+                pembahasan: "Asma adalah penyempitan saluran pernapasan yang sering dipicu oleh alergi, seperti debu atau dingin."
+            },
+            {
+                // 4. Sendi (HOTS Bergambar)
+                pertanyaan: "Perhatikan gambar sendi berikut! Arah gerakan yang dapat dilakukan oleh sendi pada gambar tersebut adalah...",
+                gambar: "gambar/sendi_4x3.jpg", // Ganti path dengan gambar rasio 4:3 milik Anda
+                pilihan: [
+                    "Gerak satu arah",
+                    "Gerak dua arah",
+                    "Gerak segala arah",
+                    "Gerak tidak beraturan"
+                ],
+                jawabanBenar: 2,
+                pembahasan: "Gambar menunjukkan sendi peluru (misal bahu/panggul) yang memungkinkan gerakan ke segala arah."
+            },
+            {
+                // 5. Dampak Lingkungan
+                pertanyaan: "Penggunaan plastik sekali pakai secara terus-menerus oleh manusia akan mengakibatkan generasi mendatang mengalami...",
+                pilihan: [
+                    "Penurunan kesuburan tanah",
+                    "Peningkatan kualitas air",
+                    "Penurunan suhu global",
+                    "Peningkatan keanekaragaman flora"
+                ],
+                jawabanBenar: 0,
+                pembahasan: "Sampah plastik sulit terurai dan mencemari tanah, sehingga menurunkan kesuburan tanah."
+            },
+            {
+                // 6. Jaring Makanan (HOTS Bergambar)
+                pertanyaan: "Berdasarkan gambar jaring-jaring makanan ini, jika populasi katak menurun drastis akibat pestisida, maka hal yang terjadi adalah...",
+                gambar: "gambar/ekosistem_4x3.jpg", // Ganti path dengan gambar rasio 4:3 milik Anda
+                pilihan: [
+                    "Populasi belalang meningkat",
+                    "Populasi ular meningkat",
+                    "Populasi elang meningkat",
+                    "Populasi padi meningkat"
+                ],
+                jawabanBenar: 0,
+                pembahasan: "Katak adalah pemangsa belalang. Jika katak berkurang, populasi belalang sebagai mangsanya akan meningkat tajam."
+            },
+            {
+                // 7. Kerusakan lingkungan
+                pertanyaan: "Aktivitas harian manusia yang paling cepat memicu terjadinya masalah pemanasan global di bumi adalah...",
+                pilihan: [
+                    "Pembakaran bahan bakar",
+                    "Penanaman pohon bakau",
+                    "Pembuatan terasering sawah",
+                    "Pengolahan pupuk kompos"
+                ],
+                jawabanBenar: 0,
+                pembahasan: "Pembakaran bahan bakar fosil menghasilkan gas rumah kaca (CO2) yang memicu pemanasan global."
+            },
+            {
+                // 8. Pencernaan
+                pertanyaan: "Enzim pepsin dan asam klorida (HCl) yang berfungsi memecah protein dan membunuh kuman dihasilkan oleh organ...",
+                pilihan: [
+                    "Organ usus halus",
+                    "Organ lambung manusia",
+                    "Organ usus besar",
+                    "Organ rongga mulut"
+                ],
+                jawabanBenar: 1,
+                pembahasan: "Lambung menghasilkan enzim pepsin, renin, dan asam klorida untuk pencernaan kimiawi."
+            },
+            {
+                // 9. Sistem Gerak
+                pertanyaan: "Tindakan harian yang paling tepat untuk menjaga kesehatan dan kepadatan tulang kita sejak dini adalah...",
+                pilihan: [
+                    "Minum susu kalsium",
+                    "Makan daging berlemak",
+                    "Minum air es",
+                    "Makan makanan manis"
+                ],
+                jawabanBenar: 0,
+                pembahasan: "Kalsium sangat penting untuk proses pembentukan dan pemeliharaan kepadatan tulang manusia."
+            },
+            {
+                // 10. ASEAN
+                pertanyaan: "Tokoh perwakilan negara Indonesia yang turut menandatangani Deklarasi Bangkok sebagai tanda berdirinya ASEAN adalah...",
+                pilihan: [
+                    "Bapak Adam Malik",
+                    "Bapak Soekarno Hatta",
+                    "Bapak Moh Yamin",
+                    "Bapak Ki Hajar"
+                ],
+                jawabanBenar: 0,
+                pembahasan: "Adam Malik adalah Menteri Luar Negeri RI yang mewakili Indonesia dalam pembentukan ASEAN."
+            },
+            // Soal 11-35 disederhanakan untuk template, tetap mempertahankan 4 opsi dengan jumlah kata sama.
+            { pertanyaan: "Peristiwa pergantian siang dan malam di muka bumi merupakan dampak langsung dari terjadinya fenomena...", pilihan: ["Gerak rotasi bumi", "Gerak revolusi bumi", "Gerak rotasi bulan", "Gerak revolusi bulan"], jawabanBenar: 0, pembahasan: "Rotasi bumi pada porosnya menyebabkan bagian bumi bergantian menghadap dan membelakangi matahari." },
+            { pertanyaan: "Sistem penanggalan kalender masehi yang kita gunakan saat ini dibuat berdasarkan perhitungan dari waktu...", pilihan: ["Bumi mengelilingi matahari", "Bulan mengelilingi bumi", "Bumi mengelilingi porosnya", "Bulan mengelilingi matahari"], jawabanBenar: 0, pembahasan: "Kalender masehi (syamsiah) dihitung berdasarkan lamanya bumi berevolusi mengelilingi matahari (365 1/4 hari)." },
+            { pertanyaan: "Perbedaan waktu antara daerah Jakarta (WIB) dan daerah Jayapura (WIT) memiliki selisih waktu selama...", pilihan: ["Dua jam penuh", "Satu jam penuh", "Tiga jam penuh", "Empat jam penuh"], jawabanBenar: 0, pembahasan: "WIB berada pada UTC+7 sedangkan WIT pada UTC+9, sehingga selisihnya adalah 2 jam." },
+            { pertanyaan: "Pemanfaatan sumber energi alternatif yang sangat cocok dikembangkan di daerah pesisir pantai berangin adalah...", pilihan: ["Kincir angin raksasa", "Panel surya atap", "Pembangkit air terjun", "Reaktor nuklir modern"], jawabanBenar: 0, pembahasan: "Kecepatan angin yang stabil di pantai sangat optimal untuk memutar turbin pembangkit listrik tenaga bayu (PLTB)." },
+            { pertanyaan: "Tindakan penghematan energi listrik paling efektif saat kita selesai menonton televisi di rumah adalah...", pilihan: ["Mencabut steker listrik", "Membiarkan posisi siaga", "Mengecilkan volume suara", "Menutup layar televisi"], jawabanBenar: 0, pembahasan: "Mencabut steker (colokan) memutus total aliran listrik, berbeda dengan mode standby yang tetap menyedot daya." },
+            { pertanyaan: "Jika satu lampu padam namun lampu lainnya tetap menyala, maka rangkaian tersebut menggunakan jenis susunan...", pilihan: ["Rangkaian listrik paralel", "Rangkaian listrik seri", "Rangkaian listrik ganda", "Rangkaian listrik campuran"], jawabanBenar: 0, pembahasan: "Pada rangkaian paralel, setiap lampu memiliki jalur kabel sendiri sehingga jika satu mati, yang lain tetap menyala." },
+            { pertanyaan: "Limbah industri mebel di Jepara yang dibuang sembarangan ke sungai akan berdampak pada penurunan pendapatan bagi...", pilihan: ["Nelayan pencari ikan", "Petani kebun jati", "Pengrajin ukir kayu", "Pedagang pasar malam"], jawabanBenar: 0, pembahasan: "Sungai yang tercemar limbah membunuh populasi ikan, sehingga tangkapan nelayan menurun." },
+            { pertanyaan: "Peristiwa sejarah Sumpah Pemuda berperan sangat penting di era globalisasi saat ini sebagai upaya untuk...", pilihan: ["Memperkuat identitas bangsa", "Menambah devisa negara", "Meningkatkan daya beli", "Membuka investasi asing"], jawabanBenar: 0, pembahasan: "Nilai persatuan Sumpah Pemuda menjadi pondasi agar budaya lokal tidak tergerus arus budaya global." },
+            { pertanyaan: "Benda langit ini memiliki ekor bercahaya yang arahnya selalu menjauhi posisi matahari. Benda tersebut adalah...", gambar: "gambar/komet_4x3.jpg", pilihan: ["Komet luar angkasa", "Planet luar angkasa", "Satelit luar angkasa", "Meteor luar angkasa"], jawabanBenar: 0, pembahasan: "Komet tersusun dari es dan debu; ekornya selalu menjauhi matahari karena dorongan angin matahari." },
+            { pertanyaan: "Ciri khas yang membedakan kelompok planet dalam dengan kelompok planet luar adalah material penyusunnya yang...", pilihan: ["Berupa batuan padat", "Berupa gas panas", "Berupa cincin es", "Berupa debu kosmis"], jawabanBenar: 0, pembahasan: "Planet dalam (Merkurius, Venus, Bumi, Mars) bersifat terestrial (padat berbatu), sedangkan planet luar adalah raksasa gas." },
+            { pertanyaan: "Dalam sebuah ekosistem sawah, jamur dan bakteri saprofit memiliki peran penting sebagai kelompok makhluk hidup...", pilihan: ["Pengurai sisa organisme", "Produsen zat makanan", "Konsumen tingkat satu", "Konsumen tingkat puncak"], jawabanBenar: 0, pembahasan: "Dekomposer (pengurai) merombak sisa tubuh makhluk hidup yang mati menjadi unsur hara." },
+            { pertanyaan: "Indonesia dijuluki sebagai negara maritim oleh dunia internasional karena memiliki ciri geografis berupa wilayah...", pilihan: ["Perairan sangat luas", "Daratan sangat luas", "Pegunungan sangat tinggi", "Hutan sangat lebat"], jawabanBenar: 0, pembahasan: "Sebutan negara maritim diberikan karena luas perairan Indonesia (2/3 wilayah) lebih besar dari daratannya." },
+            { pertanyaan: "Bentang alam populer berupa Pegunungan Himalaya dengan puncak Everest terletak di wilayah perbatasan daratan benua...", pilihan: ["Benua Asia Tengah", "Benua Eropa Timur", "Benua Amerika Utara", "Benua Afrika Selatan"], jawabanBenar: 0, pembahasan: "Himalaya terletak di Benua Asia, membentang melintasi negara seperti Nepal, India, dan Tiongkok." },
+            { pertanyaan: "Proses penggundulan hutan secara liar dan tidak terkendali sering disebut dengan istilah kerusakan lingkungan berupa...", pilihan: ["Tindakan deforestasi hutan", "Tindakan reboisasi hutan", "Tindakan konservasi hutan", "Tindakan rehabilitasi hutan"], jawabanBenar: 0, pembahasan: "Deforestasi adalah hilangnya tutupan hutan secara masif akibat penebangan atau kebakaran." },
+            { pertanyaan: "Membawa tas belanja sendiri dari rumah untuk mengurangi plastik adalah contoh nyata dari prinsip lingkungan...", pilihan: ["Prinsip reduce (mengurangi)", "Prinsip reuse (memakai)", "Prinsip recycle (mendaur)", "Prinsip replace (mengganti)"], jawabanBenar: 0, pembahasan: "Mencegah penggunaan plastik dari awal termasuk langkah Reduce (mengurangi timbulan sampah)." },
+            { pertanyaan: "Perhatikan alat penanak nasi (rice cooker) di rumah! Perubahan energi yang terjadi pada alat tersebut adalah...", gambar: "gambar/ricecooker_4x3.jpg", pilihan: ["Listrik menjadi panas", "Listrik menjadi gerak", "Listrik menjadi cahaya", "Listrik menjadi bunyi"], jawabanBenar: 0, pembahasan: "Elemen pemanas pada rice cooker mengubah energi listrik yang mengalir menjadi energi kalor (panas)." },
+            { pertanyaan: "Seni ukir kayu yang sangat terkenal di Nusantara merupakan warisan budaya benda kebanggaan dari masyarakat daerah...", pilihan: ["Kabupaten Jepara Jawa", "Kabupaten Kudus Jawa", "Kabupaten Demak Jawa", "Kabupaten Rembang Jawa"], jawabanBenar: 0, pembahasan: "Jepara diakui secara global sebagai Kota Ukir karena warisan kerajinan kayunya yang khas." },
+            { pertanyaan: "Kemudahan masyarakat Indonesia dalam membeli barang dari luar negeri melalui aplikasi daring merupakan dampak globalisasi di...", pilihan: ["Sistem perekonomian negara", "Sistem kebudayaan negara", "Sistem pertahanan negara", "Sistem perpolitikan negara"], jawabanBenar: 0, pembahasan: "Perdagangan bebas lintas batas negara (e-commerce) adalah ciri utama globalisasi di bidang ekonomi." },
+            { pertanyaan: "Benda rumah tangga yang berfungsi mengubah energi listrik menjadi energi gerak untuk mendinginkan ruangan rumah adalah...", pilihan: ["Alat kipas angin", "Alat lampu pijar", "Alat setrika baju", "Alat pemanggang roti"], jawabanBenar: 0, pembahasan: "Motor listrik di dalam kipas angin memutar baling-baling (energi gerak)." },
+            { pertanyaan: "Salah satu kekurangan utama dalam penggunaan panel surya untuk rumah tangga saat ini adalah membutuhkan biaya...", pilihan: ["Pemasangan sangat mahal", "Perawatan sangat mahal", "Pembakaran sangat mahal", "Pembuangan sangat mahal"], jawabanBenar: 0, pembahasan: "Meski energinya gratis, instalasi awal (panel dan baterai) masih membutuhkan biaya yang relatif tinggi." },
+            { pertanyaan: "Terganggunya proses peresapan air (infiltrasi) akibat penebangan hutan akan menyebabkan bencana lingkungan alam berupa...", pilihan: ["Kekeringan musim kemarau", "Tsunami musim kemarau", "Gempa musim kemarau", "Tornado musim kemarau"], jawabanBenar: 0, pembahasan: "Tanpa akar pohon, air hujan langsung mengalir (run-off) sehingga cadangan air tanah menipis." },
+            { pertanyaan: "Perubahan fisik utama yang menandai masa pubertas pada anak laki-laki akibat hormon testosteron adalah tumbuhnya...", pilihan: ["Jakun pada leher", "Rambut pada kepala", "Kuku pada jari", "Gigi pada rahang"], jawabanBenar: 0, pembahasan: "Membesarnya laring yang membentuk jakun dan merubah suara menjadi berat adalah ciri sekunder pubertas pria." },
+            { pertanyaan: "Alasan utama para pemuda menculik Soekarno-Hatta ke Rengasdengklok adalah agar kedua tokoh proklamator tersebut segera...", pilihan: ["Menjauhkan pengaruh Jepang", "Mendapatkan bantuan Jepang", "Membentuk kabinet Jepang", "Menyusun konstitusi Jepang"], jawabanBenar: 0, pembahasan: "Golongan muda ingin proklamasi dipercepat tanpa menunggu janji kemerdekaan dari pihak Jepang (PPKI)." },
+            { pertanyaan: "Langkah konkret terbaik yang bisa siswa lakukan di kantin sekolah untuk mengurangi produksi sampah plastik adalah...", pilihan: ["Membawa botol minum", "Membeli botol kemasan", "Membakar botol kemasan", "Menimbun botol kemasan"], jawabanBenar: 0, pembahasan: "Tumbler/botol minum pribadi mencegah terbentuknya sampah kemasan plastik sekali pakai di sekolah." },
+            { pertanyaan: "Langkah pertama yang paling tepat dalam merancang jurnal proyek pembuatan kincir air sederhana di sekolah adalah...", pilihan: ["Menentukan tujuan proyek", "Menyiapkan bahan proyek", "Mencatat hasil proyek", "Mempresentasikan hasil proyek"], jawabanBenar: 0, pembahasan: "Dalam metode ilmiah, menetapkan tujuan/rumusan masalah adalah langkah awal sebelum menyusun alat bahan." }
+        ];
+
+        // --- SISTEM VARIABEL & FLAG (Skor tidak melampaui 100) ---
+        let kuisArray = [];
+        let indexSoal = 0;
+        let skorMentah = 0;
+        const SKOR_MAKSIMAL = 100; // Pembatas (Limiter)
+        let isAnswered = false; // Sistem Flagging per soal
+        let namaUser = "";
+        let kelasUser = "";
+        const KODE_MAPEL = "PSASP-IPAS-HOTS"; 
+        // Kunci localStorage disamakan dengan rekap.html ("dataKuis") agar bisa berkomunikasi
+        const STORAGE_KEY = "dataKuis"; 
+
+        // Fungsi Acak Array (Fisher-Yates)
+        function acakArray(arr) {
+            let acak = [...arr];
+            for (let i = acak.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [acak[i], acak[j]] = [acak[j], acak[i]];
+            }
+            return acak;
+        }
+
+        // Tampilkan riwayat lokal di layar login tanpa tumpang tindih
+        function renderRiwayatLokal() {
+            const dataRekap = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            // FILTER DILONGGARKAN: Menampilkan "PSASP-IPAS-HOTS" dan juga riwayat yang telanjur berlabel "IPAS"
+            const riwayatIni = dataRekap.filter(d => d.mapel === KODE_MAPEL || d.mapel === "IPAS");
+            
+            const divRiwayat = document.getElementById('riwayatLokal');
+            if(riwayatIni.length === 0){
+                divRiwayat.innerHTML = "Belum ada riwayat pengerjaan.";
+                return;
+            }
+            let html = "";
+            riwayatIni.forEach(item => {
+                html += `<div class="history-item">👤 ${item.nama} (${item.kelas}) | <strong>Skor: ${item.nilai}</strong> | 🕒 ${item.waktu}</div>`;
+            });
+            divRiwayat.innerHTML = html;
+        }
+
+        document.addEventListener('DOMContentLoaded', renderRiwayatLokal);
+
+        function mulaiKuis() {
+            namaUser = document.getElementById('namaSiswa').value.trim();
+            kelasUser = document.getElementById('kelasSiswa').value.trim();
+            
+            if(!namaUser || !kelasUser) {
+                alert("Harap isi Nama dan Kelas terlebih dahulu!");
+                return;
+            }
+
+            // Reset Variabel Menyeluruh
+            skorMentah = 0;
+            indexSoal = 0;
+            kuisArray = acakArray(bankSoal); // Acak urutan soal
+            
+            document.getElementById('loginArea').style.display = 'none';
+            document.getElementById('quizArea').style.display = 'block';
+            // Menampilkan nama dan kelas di Profile Bar
+            document.getElementById('teksNama').innerHTML = `👤 <strong>${namaUser.toUpperCase()}</strong>`;
+            document.getElementById('teksKelas').innerText = `Kelas: ${kelasUser}`;
+            
+            tampilkanSoal();
+        }
+
+        function tampilkanSoal() {
+            isAnswered = false; // Reset flag
+            const soalData = kuisArray[indexSoal];
+            
+            document.getElementById('soalCounter').innerText = `Soal: ${indexSoal + 1} / ${kuisArray.length}`;
+            document.getElementById('pembahasanContainer').style.display = 'none';
+            document.getElementById('btnNext').style.display = 'none';
+            document.getElementById('btnSelesai').style.display = 'none';
+
+            let htmlSoal = `<div class="question-text">${indexSoal + 1}. ${soalData.pertanyaan}</div>`;
+            
+            if(soalData.gambar) {
+                htmlSoal += `<img src="${soalData.gambar}" alt="Gambar Soal ${indexSoal+1}" class="question-image" onerror="this.style.display='none'">`;
+            }
+
+            // Pengacakan opsi jawaban (Trik Pilihan Jawaban)
+            let opsiDenganIndex = soalData.pilihan.map((teks, i) => ({ teks, indeksAsli: i }));
+            opsiDenganIndex = acakArray(opsiDenganIndex);
+
+            let htmlOpsi = `<div class="options-grid">`;
+            opsiDenganIndex.forEach(opsi => {
+                htmlOpsi += `<button class="option-btn" onclick="cekJawaban(this, ${opsi.indeksAsli}, ${soalData.jawabanBenar})">${opsi.teks}</button>`;
+            });
+            htmlOpsi += `</div>`;
+
+            document.getElementById('soalContainer').innerHTML = htmlSoal + htmlOpsi;
+            updateSkorTampilan();
+        }
+
+        function cekJawaban(btn, indeksDipilih, indeksBenar) {
+            if(isAnswered) return; // Mencegah klik ganda (Flagging)
+            isAnswered = true;
+
+            const semuaTombol = document.querySelectorAll('.option-btn');
+            semuaTombol.forEach(b => {
+                b.style.pointerEvents = 'none'; // Matikan semua tombol
+                // Tampilkan mana yang benar
+                if(b.getAttribute('onclick').includes(`, ${indeksBenar},`)) {
+                    b.classList.add('correct');
+                }
+            });
+
+            if (indeksDipilih === indeksBenar) {
+                btn.classList.add('correct');
+                skorMentah++; // Tambah mentah
+            } else {
+                btn.classList.add('wrong');
+            }
+
+            updateSkorTampilan();
+
+            // Tampilkan Pembahasan
+            const boxBahas = document.getElementById('pembahasanContainer');
+            boxBahas.innerHTML = `<strong>Pembahasan:</strong> ${kuisArray[indexSoal].pembahasan}`;
+            boxBahas.style.display = 'block';
+
+            if (indexSoal < kuisArray.length - 1) {
+                document.getElementById('btnNext').style.display = 'block';
+            } else {
+                document.getElementById('btnSelesai').style.display = 'block';
+            }
+        }
+
+        function updateSkorTampilan() {
+            // Perhitungan Berbasis Persentase & Pembatas Maksimal 100
+            let persentaseSkor = Math.round((skorMentah / kuisArray.length) * 100);
+            let skorAkhir = Math.min(persentaseSkor, SKOR_MAKSIMAL);
+            document.getElementById('liveScore').innerText = `Skor Sementara: ${skorAkhir}`;
+        }
+
+        function soalSelanjutnya() {
+            indexSoal++;
+            tampilkanSoal();
+        }
+
+        function selesaiKuis() {
+            // Kalkulasi skor final absolut
+            let persentaseSkor = Math.round((skorMentah / kuisArray.length) * 100);
+            let skorAkhir = Math.min(persentaseSkor, SKOR_MAKSIMAL);
+
+            // 1. Ubah tombol menjadi mode loading
+            const btnSelesai = document.getElementById('btnSelesai');
+            btnSelesai.innerText = "Menyimpan Data...";
+            btnSelesai.disabled = true;
+
+            // 2. Simpan ke localStorage Global (Komunikasi dengan rekap.html)
+            const dataRekap = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            dataRekap.push({
+                nama: namaUser,
+                kelas: kelasUser,
+                mapel: KODE_MAPEL, // <-- DIKEMBALIKAN KE KODE_MAPEL AGAR MUNCUL DI LAYAR DEPAN
+                nilai: skorAkhir,
+                waktu: new Date().toLocaleString('id-ID')
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(dataRekap));
+
+            // 3. KIRIM DATA KE GOOGLE SHEETS GURU
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbwzCsI_5uv5jreQHSiNW5Dej7Iu-5Sui0uYhwIWGFwcsm8kM09C20JMwjDO8ZZRMGAs/exec'; 
+            
+            const payload = {
+                nama: namaUser,
+                kelas: kelasUser,
+                mapel: "IPAS", // <-- TETAP "IPAS" AGAR RAPI DI GOOGLE SHEETS
+                nilai: skorAkhir
+            };
+
+            fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                alert(`Kuis Selesai!\nSkor Akhir Anda: ${skorAkhir}\nData Anda telah berhasil direkam ke dalam sistem.`);
+                window.location.reload(); 
+            })
+            .catch(error => {
+                console.error("Gagal mengirim ke server guru:", error);
+                alert(`Pemberitahuan: Skor Anda (${skorAkhir}) tersimpan di perangkat, namun koneksi ke server guru sedang terganggu.`);
+                window.location.reload(); 
+            });
+        }
+    </script>
+</body>
+</html>

@@ -199,6 +199,28 @@
             .options-grid { grid-template-columns: 1fr; }
             .navigation { flex-direction: column; gap: 15px; }
         }
+        /* Tampilan Profil User yang Keren */
+        .user-profile-bar {
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+        }
+        .user-profile-bar .badge-kelas {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            backdrop-filter: blur(5px);
+        }
     </style>
 </head>
 <body>
@@ -232,6 +254,15 @@
         </div>
 
         <div id="quiz-screen">
+            
+            <!-- Profile Bar Keren -->
+            <div class="user-profile-bar" id="profilPesertaBox">
+                <span id="teksNama">👤 Memuat Nama...</span>
+                <span class="badge-kelas" id="teksKelas">Kelas: -</span>
+            </div>
+
+            <div class="question-text" id="question-text">Memuat pertanyaan...</div>
+            <img id="question-image" class="question-image" src="" alt="Ilustrasi Soal" style="display: none;">
             <div class="question-text" id="question-text">Memuat pertanyaan...</div>
             <img id="question-image" class="question-image" src="" alt="Ilustrasi Soal" style="display: none;">
             
@@ -569,6 +600,9 @@
 
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('quiz-screen').style.display = 'block';
+        // Menampilkan nama dan kelas di Profile Bar
+        document.getElementById('teksNama').innerHTML = `👤 <strong>${nama.toUpperCase()}</strong>`;
+        document.getElementById('teksKelas').innerText = `Kelas: ${kelas}`;
 
         renderQuestion();
     }
