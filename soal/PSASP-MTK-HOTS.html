@@ -110,6 +110,8 @@
         .question-image {
             max-width: 100%;
             height: auto;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
             border-radius: 8px;
             margin-bottom: 20px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -199,6 +201,7 @@
             .options-grid { grid-template-columns: 1fr; }
             .navigation { flex-direction: column; gap: 15px; }
         }
+
         /* Tampilan Profil User yang Keren */
         .user-profile-bar {
             background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
@@ -213,6 +216,7 @@
             font-size: 1.1rem;
             letter-spacing: 0.5px;
         }
+
         .user-profile-bar .badge-kelas {
             background: rgba(255, 255, 255, 0.2);
             padding: 5px 15px;
@@ -249,12 +253,11 @@
             <div class="history-container">
                 <h3>Riwayat Pengerjaan Lokal</h3>
                 <ul id="local-history-list" style="list-style: none; padding: 0;">
-                    </ul>
+                </ul>
             </div>
         </div>
 
         <div id="quiz-screen">
-            
             <!-- Profile Bar Keren -->
             <div class="user-profile-bar" id="profilPesertaBox">
                 <span id="teksNama">👤 Memuat Nama...</span>
@@ -263,11 +266,9 @@
 
             <div class="question-text" id="question-text">Memuat pertanyaan...</div>
             <img id="question-image" class="question-image" src="" alt="Ilustrasi Soal" style="display: none;">
-            <div class="question-text" id="question-text">Memuat pertanyaan...</div>
-            <img id="question-image" class="question-image" src="" alt="Ilustrasi Soal" style="display: none;">
             
             <div class="options-grid" id="options-container">
-                </div>
+            </div>
 
             <div class="explanation" id="explanation-box">
                 <strong>Pembahasan:</strong> <span id="explanation-text"></span>
@@ -275,11 +276,10 @@
 
             <div class="navigation">
                 <button class="btn btn-nav" id="btn-prev" onclick="changeQuestion(-1)">Sebelumnya</button>
-               <div class="score-display" style="display: none;">Skor: <span id="current-score">0</span></div>
+                <div class="score-display" style="display: none;">Skor: <span id="current-score">0</span></div>
                 <button class="btn btn-nav" id="btn-next" onclick="changeQuestion(1)">Selanjutnya</button>
                 <button class="btn btn-finish" id="btn-finish" onclick="finishQuiz()" style="display: none;">Selesai</button>
             </div>
-            
         </div>
 
         <div id="result-screen">
@@ -291,21 +291,24 @@
     </div>
 
     <div class="footer">
-        &copy; 2026 | Dwi Endrasto | dibuat dengan ❤️ untuk generasi cerdas bangsa. 
+        &copy; <span id="tahun-sekarang"></span> | Oleh : Dwi Endrasto | dibuat dengan ❤️ untuk generasi cerdas bangsa. 
     </div>
 </div>
 
 <script>
+    // Dinamis Tahun Footer
+    document.getElementById('tahun-sekarang').innerText = new Date().getFullYear();
+
     // PROTEKSI KEAMANAN
-    document.addEventListener('contextmenu', event => event.preventDefault()); // Anti Klik Kanan
+    document.addEventListener('contextmenu', event => event.preventDefault());
     document.addEventListener('copy', event => {
-        event.preventDefault(); // Anti Copy Paste
+        event.preventDefault();
         alert("Fitur copy dinonaktifkan demi integritas kuis.");
     });
 
     // DATABASE SOAL
     const questionBank = [
-        {
+      {
             type: "image",
             imgPath: "gambar/kubus-balok.jpg", 
             text: "Perhatikan gambar gabungan bangun ruang di atas! Volume total bangun tersebut adalah...",
@@ -349,7 +352,7 @@
             type: "text",
             text: "Hasil dari operasi hitung campuran 25.000 + 15.000 x 2 - 10.000 adalah...",
             options: ["Empat Puluh Ribu", "Lima Puluh Ribu", "Empat Lima Ribu", "Tiga Puluh Ribu"],
-            answerIndex: 0,
+            answerIndex: 2,
             explanation: "Kerjakan perkalian terlebih dahulu: 15.000 x 2 = 30.000. Kemudian jumlahkan: 25.000 + 30.000 = 55.000. Kurangi: 55.000 - 10.000 = 45.000."
         },
         {
@@ -555,7 +558,6 @@
             answerIndex: 3,
             explanation: "Untuk mengisi bagian rumpang pada perkalian, bagi hasil akhirnya: 150 dibagi 15 hasilnya sama dengan 10."
         }
-
     ];
 
     // VARIABEL STATE LOKAL
@@ -565,8 +567,23 @@
     let scoreCounter = 0;
     let answeredQuestions = [];
 
-    // INISIALISASI HALAMAN
-    document.addEventListener('DOMContentLoaded', loadLocalHistory);
+    // INISIALISASI HALAMAN & CEK SESI AKTIF
+    document.addEventListener('DOMContentLoaded', () => {
+        loadLocalHistory();
+        checkActiveSession();
+    });
+
+    function checkActiveSession() {
+        const savedSession = localStorage.getItem('sbs_active_session_MTK');
+        if (savedSession) {
+            const session = JSON.parse(savedSession);
+            if (confirm(`Halo ${session.currentUser.nama}, kamu memiliki kuis yang belum selesai dikerjakan. Ingin melanjutkan dari soal terakhir?`)) {
+                resumeQuiz(session);
+            } else {
+                localStorage.removeItem('sbs_active_session_MTK');
+            }
+        }
+    }
 
     // FUNGSI ACAK
     function shuffleArray(array) {
@@ -590,7 +607,6 @@
         }
 
         currentUser = { nama, kelas };
-
         scoreCounter = 0;
         currentQuestionIndex = 0;
         answeredQuestions = new Array(questionBank.length).fill(false);
@@ -598,13 +614,45 @@
 
         randomizedQuestions = shuffleArray([...questionBank]);
 
+        setupQuizUI();
+        renderQuestion();
+        saveSession(); // Simpan sesi saat pertama mulai
+    }
+
+    // MELANJUTKAN KUIS
+    function resumeQuiz(session) {
+        currentUser = session.currentUser;
+        randomizedQuestions = session.randomizedQuestions;
+        currentQuestionIndex = session.currentQuestionIndex;
+        scoreCounter = session.scoreCounter;
+        answeredQuestions = session.answeredQuestions;
+
+        // Isi kembali input agar tidak kosong jika user menekan tombol home
+        document.getElementById('input-nama').value = currentUser.nama;
+        document.getElementById('input-kelas').value = currentUser.kelas;
+        
+        setupQuizUI();
+        updateScoreDisplay();
+        renderQuestion();
+    }
+
+    function setupQuizUI() {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('quiz-screen').style.display = 'block';
-        // Menampilkan nama dan kelas di Profile Bar
-        document.getElementById('teksNama').innerHTML = `👤 <strong>${nama.toUpperCase()}</strong>`;
-        document.getElementById('teksKelas').innerText = `Kelas: ${kelas}`;
+        document.getElementById('teksNama').innerHTML = `👤 <strong>${currentUser.nama.toUpperCase()}</strong>`;
+        document.getElementById('teksKelas').innerText = `Kelas: ${currentUser.kelas}`;
+    }
 
-        renderQuestion();
+    // MENYIMPAN SESI
+    function saveSession() {
+        const sessionData = {
+            currentUser,
+            randomizedQuestions,
+            currentQuestionIndex,
+            scoreCounter,
+            answeredQuestions
+        };
+        localStorage.setItem('sbs_active_session_MTK', JSON.stringify(sessionData));
     }
 
     // RENDER PERTANYAAN
@@ -628,8 +676,10 @@
         let mappedOptions = q.options.map((opt, index) => ({ text: opt, isCorrect: index === q.answerIndex }));
         
         if (!hasAnswered) {
-            mappedOptions = shuffleArray(mappedOptions);
-            q.shuffledOptionsCache = mappedOptions;
+            if(!q.shuffledOptionsCache) {
+                q.shuffledOptionsCache = shuffleArray(mappedOptions);
+            }
+            mappedOptions = q.shuffledOptionsCache;
         } else {
             mappedOptions = q.shuffledOptionsCache;
         }
@@ -693,6 +743,7 @@
         document.getElementById('explanation-box').style.display = 'block';
 
         updateScoreDisplay();
+        saveSession(); // Simpan sesi saat opsi dipilih
     }
 
     // UPDATE SKOR
@@ -704,7 +755,6 @@
 
     // NAVIGASI DENGAN VALIDASI WAJIB JAWAB
     function changeQuestion(step) {
-        // Blokir jika pengguna menekan "Selanjutnya" tapi belum memilih jawaban
         if (step > 0 && !answeredQuestions[currentQuestionIndex]) {
             alert("Silakan pilih jawaban terlebih dahulu sebelum melanjutkan ke soal berikutnya!");
             return;
@@ -712,75 +762,71 @@
 
         currentQuestionIndex += step;
         renderQuestion();
+        saveSession(); // Simpan sesi saat berpindah navigasi
     }
 
     // SELESAIKAN KUIS DENGAN VALIDASI
-   function finishQuiz() {
-    // Blokir jika pengguna menekan "Selesai" di soal terakhir tapi belum dijawab
-    if (!answeredQuestions[currentQuestionIndex]) {
-        alert("Silakan pilih jawaban terlebih dahulu sebelum mengakhiri kuis!");
-        return;
+    function finishQuiz() {
+        if (!answeredQuestions[currentQuestionIndex]) {
+            alert("Silakan pilih jawaban terlebih dahulu sebelum mengakhiri kuis!");
+            return;
+        }
+
+        const btnFinish = document.getElementById('btn-finish');
+        btnFinish.innerText = "Menyimpan Data...";
+        btnFinish.disabled = true;
+
+        let percentage = (scoreCounter / randomizedQuestions.length) * 100;
+        let finalScore = Math.min(100, Math.round(percentage)); 
+
+        const dataKuis = JSON.parse(localStorage.getItem('dataKuis')) || [];
+        const now = new Date();
+        const waktuStr = `${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}`;
+        
+        dataKuis.push({
+            nama: currentUser.nama,
+            kelas: currentUser.kelas,
+            mapel: "Matematika",
+            nilai: finalScore,
+            waktu: waktuStr
+        });
+        localStorage.setItem('dataKuis', JSON.stringify(dataKuis));
+
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwzCsI_5uv5jreQHSiNW5Dej7Iu-5Sui0uYhwIWGFwcsm8kM09C20JMwjDO8ZZRMGAs/exec'; 
+        
+        const payload = {
+            nama: currentUser.nama,
+            kelas: currentUser.kelas,
+            mapel: "Matematika",
+            nilai: finalScore
+        };
+
+        // Hapus sesi aktif kuis karena sudah selesai dikerjakan
+        localStorage.removeItem('sbs_active_session_MTK');
+
+        fetch(scriptURL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            tampilkanLayarHasil(finalScore);
+        })
+        .catch(error => {
+            console.error("Gagal mengirim ke server guru:", error);
+            alert("Pemberitahuan: Skor Anda tersimpan di perangkat, namun koneksi ke server sedang terganggu.");
+            tampilkanLayarHasil(finalScore);
+        });
     }
 
-    const btnFinish = document.getElementById('btn-finish');
-    btnFinish.innerText = "Menyimpan Data...";
-    btnFinish.disabled = true;
-
-    // Hitung persentase dan batasi skor maksimal 100 untuk mencegah anomali data
-    let percentage = (scoreCounter / randomizedQuestions.length) * 100;
-    let finalScore = Math.min(100, Math.round(percentage)); 
-
-    // 1. SIMPAN KE RIWAYAT LOKAL (Agar siswa bisa melihat riwayatnya)
-    const dataKuis = JSON.parse(localStorage.getItem('dataKuis')) || [];
-    const now = new Date();
-    const waktuStr = `${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}`;
-    
-    dataKuis.push({
-        nama: currentUser.nama,
-        kelas: currentUser.kelas,
-        mapel: "Matematika",
-        nilai: finalScore,
-        waktu: waktuStr
-    });
-    localStorage.setItem('dataKuis', JSON.stringify(dataKuis));
-
-    // 2. KIRIM DATA KE GOOGLE SHEETS GURU
-    // Ganti teks di bawah ini dengan URL Web App dari Google Apps Script Bapak
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwzCsI_5uv5jreQHSiNW5Dej7Iu-5Sui0uYhwIWGFwcsm8kM09C20JMwjDO8ZZRMGAs/exec'; 
-    
-    const payload = {
-        nama: currentUser.nama,
-        kelas: currentUser.kelas,
-        mapel: "Matematika",
-        nilai: finalScore
-    };
-
-    fetch(scriptURL, {
-        method: 'POST',
-        body: JSON.stringify(payload)
-    })
-    .then(response => {
-        // Tampilkan layar hasil jika berhasil terkirim
-        tampilkanLayarHasil(finalScore);
-    })
-    .catch(error => {
-        // Jika internet siswa bermasalah, tetap tampilkan hasil dari perhitungan lokal
-        console.error("Gagal mengirim ke server guru:", error);
-        alert("Pemberitahuan: Skor Anda tersimpan di perangkat, namun koneksi ke server guru sedang terganggu.");
-        tampilkanLayarHasil(finalScore);
-    });
-}
-
-// Fungsi bantuan untuk menampilkan layar hasil
-function tampilkanLayarHasil(skor) {
-    document.getElementById('quiz-screen').style.display = 'none';
-    document.getElementById('result-screen').style.display = 'block';
-    document.getElementById('final-score-display').innerText = skor;
-    
-    const btnFinish = document.getElementById('btn-finish');
-    btnFinish.innerText = "Selesai";
-    btnFinish.disabled = false;
-}
+    function tampilkanLayarHasil(skor) {
+        document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+        document.getElementById('final-score-display').innerText = skor;
+        
+        const btnFinish = document.getElementById('btn-finish');
+        btnFinish.innerText = "Selesai";
+        btnFinish.disabled = false;
+    }
 
     // LOAD RIWAYAT LOKAL
     function loadLocalHistory() {
@@ -803,6 +849,5 @@ function tampilkanLayarHasil(skor) {
         });
     }
 </script>
-
 </body>
 </html>

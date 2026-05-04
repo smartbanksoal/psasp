@@ -1,5 +1,5 @@
 // Nama cache versi (Naikkan versinya ke v2, v3, dst. jika nanti ada perubahan file)
-const CACHE_NAME = 'psasp-v2';
+const CACHE_NAME = 'psasp-v3';
 
 const urlsToCache = [
   './',
@@ -13,7 +13,8 @@ const urlsToCache = [
   // Daftar file soal terbaru:
   './soal/PSASP-INDO-HOTS.html',
   './soal/PSASP-MTK-HOTS.html',
- '/soal/gambar/kubus-balok.jpg',
+  './soal/PSASP-IPAS-HOTS.html',
+  '/soal/gambar/kubus-balok.jpg',
   '/soal/gambar/diagram-batang.jpg',
   '/soal/gambar/pizza-pecahan.jpg',
   '/soal/gambar/peta-koordinat.jpg',
@@ -22,7 +23,12 @@ const urlsToCache = [
   '/soal/gambar/infografik_dbd.jpg',
   '/soal/gambar/kuitansi_buku.jpg',
   '/soal/gambar/iklan_gigi.jpg',
-  '/soal/gambar/suasana_hutan.jpg'
+  '/soal/gambar/ekosistem_4x3.jpg',
+  '/soal/gambar/komet_4x3.jpg',
+  '/soal/gambar/mata_4x3.jpg',
+  '/soal/gambar/ricecooker_4x3.jpg',
+  '/soal/gambar/sendi_4x3.jpg'
+
 
   // Jika di dalam soal PSASP terdapat gambar, tambahkan daftarnya di bawah ini.
   // Pastikan tetap menggunakan folder 'gambar' untuk konsistensi struktur:

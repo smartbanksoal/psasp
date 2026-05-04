@@ -161,6 +161,8 @@
             width: 100%;
             max-width: 400px;
             height: auto;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
             border-radius: 8px;
             margin-bottom: 15px;
             display: block;
@@ -182,15 +184,15 @@
         }
 
         .option-btn.correct {
-            background-color: var(--correct);
-            color: white;
-            border-color: #388E3C;
+            background-color: var(--correct) !important;
+            color: white !important;
+            border-color: #388E3C !important;
         }
 
         .option-btn.wrong {
-            background-color: var(--wrong);
-            color: white;
-            border-color: #D32F2F;
+            background-color: var(--wrong) !important;
+            color: white !important;
+            border-color: #D32F2F !important;
         }
 
         .explanation-box {
@@ -203,14 +205,26 @@
             font-size: 0.95rem;
         }
 
+        /* Layout Navigasi Baru */
         .nav-buttons {
             display: flex;
             justify-content: space-between;
             margin-top: 20px;
+            gap: 10px;
         }
 
-        .nav-btn { background-color: var(--secondary); display: none; }
-        .finish-btn { background-color: var(--primary); display: none; width: 100%; }
+        .nav-btn { 
+            background-color: var(--secondary); 
+            display: none; 
+            flex: 1; 
+        }
+
+        .finish-btn { 
+            background-color: var(--primary); 
+            display: none; 
+            width: 100%; 
+            margin-top: 15px;
+        }
 
         /* Tampilan Profil User yang Keren */
         .user-profile-bar {
@@ -237,8 +251,7 @@
 
     </style>
 </head>
-<body oncontextmenu="return false;"> <!-- Proteksi Klik Kanan -->
-
+<body oncontextmenu="return false;"> 
     <header>Kode Soal: PSASP-IPAS-HOTS</header>
 
     <div class="container" id="loginArea">
@@ -258,7 +271,6 @@
 
     <div class="container quiz-screen" id="quizArea">
         
-        <!-- Profile Bar Keren yang Baru -->
         <div class="user-profile-bar" id="profilPesertaBox">
             <span id="teksNama">👤 Memuat Nama...</span>
             <span class="badge-kelas" id="teksKelas">Kelas: -</span>
@@ -269,149 +281,32 @@
             <span id="liveScore">Skor Sementara: 0</span>
         </div>
         
-        <!-- Area Soal -->
         <div id="soalContainer"></div>
         
-        <!-- Pembahasan -->
         <div class="explanation-box" id="pembahasanContainer"></div>
 
-        <!-- Navigasi -->
         <div class="nav-buttons">
-            <button class="nav-btn" id="btnNext" onclick="soalSelanjutnya()">Soal Selanjutnya ➔</button>
+            <button class="nav-btn" id="btnPrev" onclick="soalSebelumnya()">&#8592; Sebelumnya</button>
+            <button class="nav-btn" id="btnNext" onclick="soalSelanjutnya()">Selanjutnya &#8594;</button>
         </div>
         <button class="finish-btn" id="btnSelesai" onclick="selesaiKuis()">Selesai & Simpan Nilai</button>
     </div>
 
-    <footer>Oleh : Dwi Endrasto - hak cipta dilindungi | Dibuat dengan ❤️ untuk generasi cerdas bangsa.</footer>
+    <footer>Oleh : Dwi Endrasto - Hak Cipta © <span id="tahunCopyright"></span> | Dibuat dengan ❤️ untuk generasi cerdas bangsa.</footer>
 
     <script>
         // DATA SOAL (35 Soal Kisi-Kisi)
-        // Ketentuan: 5 Soal Bergambar Rasio 4:3, Jawaban Kata Sama Jumlahnya, Diacak
         const bankSoal = [
-            {
-                // 1. Mata (HOTS Bergambar)
-                pertanyaan: "Perhatikan gambar anatomi mata di bawah ini! Bagian yang ditunjuk oleh nomor 1 berfungsi secara khusus untuk...",
-                gambar: "gambar/mata_4x3.jpg", // Ganti path dengan gambar rasio 4:3 milik Anda
-                pilihan: [
-                    "Mengatur jumlah cahaya",
-                    "Meneruskan jalan cahaya",
-                    "Memfokuskan arah cahaya",
-                    "Menangkap bayangan cahaya"
-                ],
-                jawabanBenar: 0,
-                pembahasan: "Iris berfungsi mengatur jumlah cahaya yang masuk ke mata dengan mengubah ukuran pupil."
-            },
-            {
-                // 2. Lapisan Atmosfer
-                pertanyaan: "Lapisan atmosfer ini melindungi bumi dari jatuhnya meteor dan benda langit lainnya. Lapisan yang dimaksud adalah...",
-                pilihan: [
-                    "Lapisan bawah troposfer",
-                    "Lapisan tengah mesosfer",
-                    "Lapisan atas termosfer",
-                    "Lapisan luar eksosfer"
-                ],
-                jawabanBenar: 1,
-                pembahasan: "Mesosfer adalah lapisan atmosfer yang berfungsi membakar meteor yang menuju ke Bumi."
-            },
-            {
-                // 3. Pernapasan
-                pertanyaan: "Seseorang mengalami sesak napas karena penyempitan saluran pernapasan akibat alergi debu. Gangguan tersebut dinamakan...",
-                pilihan: [
-                    "Penyakit asma bronkial",
-                    "Penyakit flu menular",
-                    "Penyakit tuberkulosis paru",
-                    "Penyakit bronkitis akut"
-                ],
-                jawabanBenar: 0,
-                pembahasan: "Asma adalah penyempitan saluran pernapasan yang sering dipicu oleh alergi, seperti debu atau dingin."
-            },
-            {
-                // 4. Sendi (HOTS Bergambar)
-                pertanyaan: "Perhatikan gambar sendi berikut! Arah gerakan yang dapat dilakukan oleh sendi pada gambar tersebut adalah...",
-                gambar: "gambar/sendi_4x3.jpg", // Ganti path dengan gambar rasio 4:3 milik Anda
-                pilihan: [
-                    "Gerak satu arah",
-                    "Gerak dua arah",
-                    "Gerak segala arah",
-                    "Gerak tidak beraturan"
-                ],
-                jawabanBenar: 2,
-                pembahasan: "Gambar menunjukkan sendi peluru (misal bahu/panggul) yang memungkinkan gerakan ke segala arah."
-            },
-            {
-                // 5. Dampak Lingkungan
-                pertanyaan: "Penggunaan plastik sekali pakai secara terus-menerus oleh manusia akan mengakibatkan generasi mendatang mengalami...",
-                pilihan: [
-                    "Penurunan kesuburan tanah",
-                    "Peningkatan kualitas air",
-                    "Penurunan suhu global",
-                    "Peningkatan keanekaragaman flora"
-                ],
-                jawabanBenar: 0,
-                pembahasan: "Sampah plastik sulit terurai dan mencemari tanah, sehingga menurunkan kesuburan tanah."
-            },
-            {
-                // 6. Jaring Makanan (HOTS Bergambar)
-                pertanyaan: "Berdasarkan gambar jaring-jaring makanan ini, jika populasi katak menurun drastis akibat pestisida, maka hal yang terjadi adalah...",
-                gambar: "gambar/ekosistem_4x3.jpg", // Ganti path dengan gambar rasio 4:3 milik Anda
-                pilihan: [
-                    "Populasi belalang meningkat",
-                    "Populasi ular meningkat",
-                    "Populasi elang meningkat",
-                    "Populasi padi meningkat"
-                ],
-                jawabanBenar: 0,
-                pembahasan: "Katak adalah pemangsa belalang. Jika katak berkurang, populasi belalang sebagai mangsanya akan meningkat tajam."
-            },
-            {
-                // 7. Kerusakan lingkungan
-                pertanyaan: "Aktivitas harian manusia yang paling cepat memicu terjadinya masalah pemanasan global di bumi adalah...",
-                pilihan: [
-                    "Pembakaran bahan bakar",
-                    "Penanaman pohon bakau",
-                    "Pembuatan terasering sawah",
-                    "Pengolahan pupuk kompos"
-                ],
-                jawabanBenar: 0,
-                pembahasan: "Pembakaran bahan bakar fosil menghasilkan gas rumah kaca (CO2) yang memicu pemanasan global."
-            },
-            {
-                // 8. Pencernaan
-                pertanyaan: "Enzim pepsin dan asam klorida (HCl) yang berfungsi memecah protein dan membunuh kuman dihasilkan oleh organ...",
-                pilihan: [
-                    "Organ usus halus",
-                    "Organ lambung manusia",
-                    "Organ usus besar",
-                    "Organ rongga mulut"
-                ],
-                jawabanBenar: 1,
-                pembahasan: "Lambung menghasilkan enzim pepsin, renin, dan asam klorida untuk pencernaan kimiawi."
-            },
-            {
-                // 9. Sistem Gerak
-                pertanyaan: "Tindakan harian yang paling tepat untuk menjaga kesehatan dan kepadatan tulang kita sejak dini adalah...",
-                pilihan: [
-                    "Minum susu kalsium",
-                    "Makan daging berlemak",
-                    "Minum air es",
-                    "Makan makanan manis"
-                ],
-                jawabanBenar: 0,
-                pembahasan: "Kalsium sangat penting untuk proses pembentukan dan pemeliharaan kepadatan tulang manusia."
-            },
-            {
-                // 10. ASEAN
-                pertanyaan: "Tokoh perwakilan negara Indonesia yang turut menandatangani Deklarasi Bangkok sebagai tanda berdirinya ASEAN adalah...",
-                pilihan: [
-                    "Bapak Adam Malik",
-                    "Bapak Soekarno Hatta",
-                    "Bapak Moh Yamin",
-                    "Bapak Ki Hajar"
-                ],
-                jawabanBenar: 0,
-                pembahasan: "Adam Malik adalah Menteri Luar Negeri RI yang mewakili Indonesia dalam pembentukan ASEAN."
-            },
-            // Soal 11-35 disederhanakan untuk template, tetap mempertahankan 4 opsi dengan jumlah kata sama.
+            { pertanyaan: "Perhatikan gambar anatomi mata di bawah ini! Bagian yang ditunjuk oleh nomor 1 berfungsi secara khusus untuk...", gambar: "gambar/mata_4x3.jpg", pilihan: ["Mengatur jumlah cahaya", "Meneruskan jalan cahaya", "Memfokuskan arah cahaya", "Menangkap bayangan cahaya"], jawabanBenar: 0, pembahasan: "Iris berfungsi mengatur jumlah cahaya yang masuk ke mata dengan mengubah ukuran pupil." },
+            { pertanyaan: "Lapisan atmosfer ini melindungi bumi dari jatuhnya meteor dan benda langit lainnya. Lapisan yang dimaksud adalah...", pilihan: ["Lapisan bawah troposfer", "Lapisan tengah mesosfer", "Lapisan atas termosfer", "Lapisan luar eksosfer"], jawabanBenar: 1, pembahasan: "Mesosfer adalah lapisan atmosfer yang berfungsi membakar meteor yang menuju ke Bumi." },
+            { pertanyaan: "Seseorang mengalami sesak napas karena penyempitan saluran pernapasan akibat alergi debu. Gangguan tersebut dinamakan...", pilihan: ["Penyakit asma bronkial", "Penyakit flu menular", "Penyakit tuberkulosis paru", "Penyakit bronkitis akut"], jawabanBenar: 0, pembahasan: "Asma adalah penyempitan saluran pernapasan yang sering dipicu oleh alergi, seperti debu atau dingin." },
+            { pertanyaan: "Perhatikan gambar sendi berikut! Arah gerakan yang dapat dilakukan oleh sendi pada gambar tersebut adalah...", gambar: "gambar/sendi_4x3.jpg", pilihan: ["Gerak satu arah", "Gerak dua arah", "Gerak segala arah", "Gerak tidak beraturan"], jawabanBenar: 2, pembahasan: "Gambar menunjukkan sendi peluru (misal bahu/panggul) yang memungkinkan gerakan ke segala arah." },
+            { pertanyaan: "Penggunaan plastik sekali pakai secara terus-menerus oleh manusia akan mengakibatkan generasi mendatang mengalami...", pilihan: ["Penurunan kesuburan tanah", "Peningkatan kualitas air", "Penurunan suhu global", "Peningkatan keanekaragaman flora"], jawabanBenar: 0, pembahasan: "Sampah plastik sulit terurai dan mencemari tanah, sehingga menurunkan kesuburan tanah." },
+            { pertanyaan: "Berdasarkan gambar jaring-jaring makanan ini, jika populasi katak menurun drastis akibat pestisida, maka hal yang terjadi adalah...", gambar: "gambar/ekosistem_4x3.jpg", pilihan: ["Populasi belalang meningkat", "Populasi ular meningkat", "Populasi elang meningkat", "Populasi padi meningkat"], jawabanBenar: 0, pembahasan: "Katak adalah pemangsa belalang. Jika katak berkurang, populasi belalang sebagai mangsanya akan meningkat tajam." },
+            { pertanyaan: "Aktivitas harian manusia yang paling cepat memicu terjadinya masalah pemanasan global di bumi adalah...", pilihan: ["Pembakaran bahan bakar", "Penanaman pohon bakau", "Pembuatan terasering sawah", "Pengolahan pupuk kompos"], jawabanBenar: 0, pembahasan: "Pembakaran bahan bakar fosil menghasilkan gas rumah kaca (CO2) yang memicu pemanasan global." },
+            { pertanyaan: "Enzim pepsin dan asam klorida (HCl) yang berfungsi memecah protein dan membunuh kuman dihasilkan oleh organ...", pilihan: ["Organ usus halus", "Organ lambung manusia", "Organ usus besar", "Organ rongga mulut"], jawabanBenar: 1, pembahasan: "Lambung menghasilkan enzim pepsin, renin, dan asam klorida untuk pencernaan kimiawi." },
+            { pertanyaan: "Tindakan harian yang paling tepat untuk menjaga kesehatan dan kepadatan tulang kita sejak dini adalah...", pilihan: ["Minum susu kalsium", "Makan daging berlemak", "Minum air es", "Makan makanan manis"], jawabanBenar: 0, pembahasan: "Kalsium sangat penting untuk proses pembentukan dan pemeliharaan kepadatan tulang manusia." },
+            { pertanyaan: "Tokoh perwakilan negara Indonesia yang turut menandatangani Deklarasi Bangkok sebagai tanda berdirinya ASEAN adalah...", pilihan: ["Bapak Adam Malik", "Bapak Soekarno Hatta", "Bapak Moh Yamin", "Bapak Ki Hajar"], jawabanBenar: 0, pembahasan: "Adam Malik adalah Menteri Luar Negeri RI yang mewakili Indonesia dalam pembentukan ASEAN." },
             { pertanyaan: "Peristiwa pergantian siang dan malam di muka bumi merupakan dampak langsung dari terjadinya fenomena...", pilihan: ["Gerak rotasi bumi", "Gerak revolusi bumi", "Gerak rotasi bulan", "Gerak revolusi bulan"], jawabanBenar: 0, pembahasan: "Rotasi bumi pada porosnya menyebabkan bagian bumi bergantian menghadap dan membelakangi matahari." },
             { pertanyaan: "Sistem penanggalan kalender masehi yang kita gunakan saat ini dibuat berdasarkan perhitungan dari waktu...", pilihan: ["Bumi mengelilingi matahari", "Bulan mengelilingi bumi", "Bumi mengelilingi porosnya", "Bulan mengelilingi matahari"], jawabanBenar: 0, pembahasan: "Kalender masehi (syamsiah) dihitung berdasarkan lamanya bumi berevolusi mengelilingi matahari (365 1/4 hari)." },
             { pertanyaan: "Perbedaan waktu antara daerah Jakarta (WIB) dan daerah Jayapura (WIT) memiliki selisih waktu selama...", pilihan: ["Dua jam penuh", "Satu jam penuh", "Tiga jam penuh", "Empat jam penuh"], jawabanBenar: 0, pembahasan: "WIB berada pada UTC+7 sedangkan WIT pada UTC+9, sehingga selisihnya adalah 2 jam." },
@@ -424,7 +319,7 @@
             { pertanyaan: "Ciri khas yang membedakan kelompok planet dalam dengan kelompok planet luar adalah material penyusunnya yang...", pilihan: ["Berupa batuan padat", "Berupa gas panas", "Berupa cincin es", "Berupa debu kosmis"], jawabanBenar: 0, pembahasan: "Planet dalam (Merkurius, Venus, Bumi, Mars) bersifat terestrial (padat berbatu), sedangkan planet luar adalah raksasa gas." },
             { pertanyaan: "Dalam sebuah ekosistem sawah, jamur dan bakteri saprofit memiliki peran penting sebagai kelompok makhluk hidup...", pilihan: ["Pengurai sisa organisme", "Produsen zat makanan", "Konsumen tingkat satu", "Konsumen tingkat puncak"], jawabanBenar: 0, pembahasan: "Dekomposer (pengurai) merombak sisa tubuh makhluk hidup yang mati menjadi unsur hara." },
             { pertanyaan: "Indonesia dijuluki sebagai negara maritim oleh dunia internasional karena memiliki ciri geografis berupa wilayah...", pilihan: ["Perairan sangat luas", "Daratan sangat luas", "Pegunungan sangat tinggi", "Hutan sangat lebat"], jawabanBenar: 0, pembahasan: "Sebutan negara maritim diberikan karena luas perairan Indonesia (2/3 wilayah) lebih besar dari daratannya." },
-            { pertanyaan: "Bentang alam populer berupa Pegunungan Himalaya dengan puncak Everest terletak di wilayah perbatasan daratan benua...", pilihan: ["Benua Asia Tengah", "Benua Eropa Timur", "Benua Amerika Utara", "Benua Afrika Selatan"], jawabanBenar: 0, pembahasan: "Himalaya terletak di Benua Asia, membentang melintasi negara seperti Nepal, India, dan Tiongkok." },
+            { pertanyaan: "Bentang alam populer berupa Pegunungan Himalaya dengan puncak Everest terletak di wilayah perbatasan daratan benua...", pilihan: ["Kawasan Benua Asia", "Benua Eropa Timur", "Benua Amerika Utara", "Benua Afrika Selatan"], jawabanBenar: 0, pembahasan: "Himalaya terletak di Benua Asia, membentang melintasi negara seperti Nepal, India, dan Tiongkok." },
             { pertanyaan: "Proses penggundulan hutan secara liar dan tidak terkendali sering disebut dengan istilah kerusakan lingkungan berupa...", pilihan: ["Tindakan deforestasi hutan", "Tindakan reboisasi hutan", "Tindakan konservasi hutan", "Tindakan rehabilitasi hutan"], jawabanBenar: 0, pembahasan: "Deforestasi adalah hilangnya tutupan hutan secara masif akibat penebangan atau kebakaran." },
             { pertanyaan: "Membawa tas belanja sendiri dari rumah untuk mengurangi plastik adalah contoh nyata dari prinsip lingkungan...", pilihan: ["Prinsip reduce (mengurangi)", "Prinsip reuse (memakai)", "Prinsip recycle (mendaur)", "Prinsip replace (mengganti)"], jawabanBenar: 0, pembahasan: "Mencegah penggunaan plastik dari awal termasuk langkah Reduce (mengurangi timbulan sampah)." },
             { pertanyaan: "Perhatikan alat penanak nasi (rice cooker) di rumah! Perubahan energi yang terjadi pada alat tersebut adalah...", gambar: "gambar/ricecooker_4x3.jpg", pilihan: ["Listrik menjadi panas", "Listrik menjadi gerak", "Listrik menjadi cahaya", "Listrik menjadi bunyi"], jawabanBenar: 0, pembahasan: "Elemen pemanas pada rice cooker mengubah energi listrik yang mengalir menjadi energi kalor (panas)." },
@@ -439,19 +334,19 @@
             { pertanyaan: "Langkah pertama yang paling tepat dalam merancang jurnal proyek pembuatan kincir air sederhana di sekolah adalah...", pilihan: ["Menentukan tujuan proyek", "Menyiapkan bahan proyek", "Mencatat hasil proyek", "Mempresentasikan hasil proyek"], jawabanBenar: 0, pembahasan: "Dalam metode ilmiah, menetapkan tujuan/rumusan masalah adalah langkah awal sebelum menyusun alat bahan." }
         ];
 
-        // --- SISTEM VARIABEL & FLAG (Skor tidak melampaui 100) ---
+        // --- SISTEM VARIABEL & FLAG ---
         let kuisArray = [];
         let indexSoal = 0;
         let skorMentah = 0;
-        const SKOR_MAKSIMAL = 100; // Pembatas (Limiter)
-        let isAnswered = false; // Sistem Flagging per soal
+        const SKOR_MAKSIMAL = 100; 
+        let isAnswered = false; 
         let namaUser = "";
         let kelasUser = "";
         const KODE_MAPEL = "PSASP-IPAS-HOTS"; 
-        // Kunci localStorage disamakan dengan rekap.html ("dataKuis") agar bisa berkomunikasi
         const STORAGE_KEY = "dataKuis"; 
+        const PROGRESS_KEY = "progres_" + KODE_MAPEL; 
 
-        // Fungsi Acak Array (Fisher-Yates)
+        // Fungsi Acak Array
         function acakArray(arr) {
             let acak = [...arr];
             for (let i = acak.length - 1; i > 0; i--) {
@@ -461,25 +356,45 @@
             return acak;
         }
 
-        // Tampilkan riwayat lokal di layar login tanpa tumpang tindih
-        function renderRiwayatLokal() {
+        // Tampilkan riwayat lokal dan set tahun footer otomatis
+        function inisialisasiAwal() {
             const dataRekap = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-            // FILTER DILONGGARKAN: Menampilkan "PSASP-IPAS-HOTS" dan juga riwayat yang telanjur berlabel "IPAS"
             const riwayatIni = dataRekap.filter(d => d.mapel === KODE_MAPEL || d.mapel === "IPAS");
             
             const divRiwayat = document.getElementById('riwayatLokal');
             if(riwayatIni.length === 0){
                 divRiwayat.innerHTML = "Belum ada riwayat pengerjaan.";
-                return;
+            } else {
+                let html = "";
+                riwayatIni.slice(-5).reverse().forEach(item => {
+                    html += `<div class="history-item">👤 ${item.nama} (${item.kelas}) | <strong>Skor: ${item.nilai}</strong> | 🕒 ${item.waktu}</div>`;
+                });
+                divRiwayat.innerHTML = html;
             }
-            let html = "";
-            riwayatIni.forEach(item => {
-                html += `<div class="history-item">👤 ${item.nama} (${item.kelas}) | <strong>Skor: ${item.nilai}</strong> | 🕒 ${item.waktu}</div>`;
-            });
-            divRiwayat.innerHTML = html;
+
+            const elemenTahun = document.getElementById('tahunCopyright');
+            if(elemenTahun) {
+                elemenTahun.innerText = new Date().getFullYear();
+            }
         }
 
-        document.addEventListener('DOMContentLoaded', renderRiwayatLokal);
+        document.addEventListener('DOMContentLoaded', inisialisasiAwal);
+
+        // --- FUNGSI AUTO-SAVE ---
+        function simpanProgres() {
+            const dataProgres = {
+                nama: namaUser,
+                kelas: kelasUser,
+                kuisArray: kuisArray, 
+                indexSoal: indexSoal,
+                skorMentah: skorMentah
+            };
+            localStorage.setItem(PROGRESS_KEY, JSON.stringify(dataProgres));
+        }
+
+        function hapusProgres() {
+            localStorage.removeItem(PROGRESS_KEY);
+        }
 
         function mulaiKuis() {
             namaUser = document.getElementById('namaSiswa').value.trim();
@@ -490,14 +405,30 @@
                 return;
             }
 
-            // Reset Variabel Menyeluruh
+            const savedData = JSON.parse(localStorage.getItem(PROGRESS_KEY));
+            if (savedData && savedData.nama.toLowerCase() === namaUser.toLowerCase() && savedData.kelas.toLowerCase() === kelasUser.toLowerCase()) {
+                const lanjut = confirm(`Halo ${namaUser}, kamu memiliki sesi kuis yang belum selesai.\nIngin melanjutkan dari soal terakhir tanpa kehilangan progres?`);
+                
+                if (lanjut) {
+                    kuisArray = savedData.kuisArray;
+                    indexSoal = savedData.indexSoal;
+                    skorMentah = savedData.skorMentah;
+                    masukKeLayarKuis();
+                    return; 
+                } else {
+                    hapusProgres(); 
+                }
+            }
+
             skorMentah = 0;
             indexSoal = 0;
-            kuisArray = acakArray(bankSoal); // Acak urutan soal
-            
+            kuisArray = acakArray(bankSoal); 
+            masukKeLayarKuis();
+        }
+
+        function masukKeLayarKuis() {
             document.getElementById('loginArea').style.display = 'none';
             document.getElementById('quizArea').style.display = 'block';
-            // Menampilkan nama dan kelas di Profile Bar
             document.getElementById('teksNama').innerHTML = `👤 <strong>${namaUser.toUpperCase()}</strong>`;
             document.getElementById('teksKelas').innerText = `Kelas: ${kelasUser}`;
             
@@ -505,13 +436,26 @@
         }
 
         function tampilkanSoal() {
-            isAnswered = false; // Reset flag
             const soalData = kuisArray[indexSoal];
+            isAnswered = soalData.terjawab || false; 
             
             document.getElementById('soalCounter').innerText = `Soal: ${indexSoal + 1} / ${kuisArray.length}`;
             document.getElementById('pembahasanContainer').style.display = 'none';
-            document.getElementById('btnNext').style.display = 'none';
-            document.getElementById('btnSelesai').style.display = 'none';
+            
+            // Atur Navigasi (Membuka kunci otomatis jika sudah dijawab)
+            document.getElementById('btnPrev').style.display = (indexSoal > 0) ? 'inline-block' : 'none';
+            if (soalData.terjawab) {
+                if (indexSoal < kuisArray.length - 1) {
+                    document.getElementById('btnNext').style.display = 'inline-block';
+                    document.getElementById('btnSelesai').style.display = 'none';
+                } else {
+                    document.getElementById('btnNext').style.display = 'none';
+                    document.getElementById('btnSelesai').style.display = 'inline-block';
+                }
+            } else {
+                document.getElementById('btnNext').style.display = 'none';
+                document.getElementById('btnSelesai').style.display = 'none';
+            }
 
             let htmlSoal = `<div class="question-text">${indexSoal + 1}. ${soalData.pertanyaan}</div>`;
             
@@ -519,94 +463,120 @@
                 htmlSoal += `<img src="${soalData.gambar}" alt="Gambar Soal ${indexSoal+1}" class="question-image" onerror="this.style.display='none'">`;
             }
 
-            // Pengacakan opsi jawaban (Trik Pilihan Jawaban)
-            let opsiDenganIndex = soalData.pilihan.map((teks, i) => ({ teks, indeksAsli: i }));
-            opsiDenganIndex = acakArray(opsiDenganIndex);
+            if (!soalData.opsiAcak) {
+                let opsiDenganIndex = soalData.pilihan.map((teks, i) => ({ teks, indeksAsli: i }));
+                soalData.opsiAcak = acakArray(opsiDenganIndex);
+                simpanProgres(); 
+            }
 
             let htmlOpsi = `<div class="options-grid">`;
-            opsiDenganIndex.forEach(opsi => {
-                htmlOpsi += `<button class="option-btn" onclick="cekJawaban(this, ${opsi.indeksAsli}, ${soalData.jawabanBenar})">${opsi.teks}</button>`;
+            soalData.opsiAcak.forEach((opsi, i) => {
+                // Sembunyikan atribut kebenaran jawaban dengan dataset
+                let isBenar = (opsi.indeksAsli === soalData.jawabanBenar) ? 'true' : 'false';
+                htmlOpsi += `<button class="option-btn" id="btn-opsi-${i}" data-benar="${isBenar}" onclick="cekJawaban(this, ${opsi.indeksAsli}, ${soalData.jawabanBenar}, ${i})">${opsi.teks}</button>`;
             });
             htmlOpsi += `</div>`;
 
             document.getElementById('soalContainer').innerHTML = htmlSoal + htmlOpsi;
-            updateSkorTampilan();
+            
+            if (soalData.terjawab) {
+                const btn = document.getElementById(`btn-opsi-${soalData.indeksTombolTerpilih}`);
+                cekJawaban(btn, soalData.indeksPilihanUser, soalData.jawabanBenar, soalData.indeksTombolTerpilih, true);
+            } else {
+                updateSkorTampilan();
+            }
         }
 
-        function cekJawaban(btn, indeksDipilih, indeksBenar) {
-            if(isAnswered) return; // Mencegah klik ganda (Flagging)
+        function cekJawaban(btn, indeksDipilih, indeksBenar, indeksTombol, isRestoring = false) {
+            if(isAnswered && !isRestoring) return; 
             isAnswered = true;
 
+            const soalData = kuisArray[indexSoal];
+
+            if (!isRestoring) {
+                soalData.terjawab = true;
+                soalData.indeksPilihanUser = indeksDipilih;
+                soalData.indeksTombolTerpilih = indeksTombol;
+                if (indeksDipilih === indeksBenar) {
+                    skorMentah++; 
+                }
+                simpanProgres();
+            }
+
+            // PERBAIKAN LOGIKA WARNA
             const semuaTombol = document.querySelectorAll('.option-btn');
             semuaTombol.forEach(b => {
-                b.style.pointerEvents = 'none'; // Matikan semua tombol
-                // Tampilkan mana yang benar
-                if(b.getAttribute('onclick').includes(`, ${indeksBenar},`)) {
-                    b.classList.add('correct');
+                b.style.pointerEvents = 'none'; 
+                // Cek akurat menggunakan atribut data-benar
+                if(b.getAttribute('data-benar') === 'true') {
+                    b.classList.add('correct'); // Jawaban benar selalu menjadi hijau
                 }
             });
 
-            if (indeksDipilih === indeksBenar) {
-                btn.classList.add('correct');
-                skorMentah++; // Tambah mentah
-            } else {
+            // Jika jawaban yang dipilih pengguna salah, maka jadikan tombol pilihannya menjadi merah
+            if (indeksDipilih !== indeksBenar) {
                 btn.classList.add('wrong');
             }
 
             updateSkorTampilan();
 
-            // Tampilkan Pembahasan
             const boxBahas = document.getElementById('pembahasanContainer');
             boxBahas.innerHTML = `<strong>Pembahasan:</strong> ${kuisArray[indexSoal].pembahasan}`;
             boxBahas.style.display = 'block';
 
             if (indexSoal < kuisArray.length - 1) {
-                document.getElementById('btnNext').style.display = 'block';
+                document.getElementById('btnNext').style.display = 'inline-block';
             } else {
-                document.getElementById('btnSelesai').style.display = 'block';
+                document.getElementById('btnSelesai').style.display = 'inline-block';
             }
         }
 
         function updateSkorTampilan() {
-            // Perhitungan Berbasis Persentase & Pembatas Maksimal 100
             let persentaseSkor = Math.round((skorMentah / kuisArray.length) * 100);
             let skorAkhir = Math.min(persentaseSkor, SKOR_MAKSIMAL);
             document.getElementById('liveScore').innerText = `Skor Sementara: ${skorAkhir}`;
         }
 
         function soalSelanjutnya() {
-            indexSoal++;
-            tampilkanSoal();
+            if (indexSoal < kuisArray.length - 1) {
+                indexSoal++;
+                tampilkanSoal();
+            }
+        }
+
+        function soalSebelumnya() {
+            if (indexSoal > 0) {
+                indexSoal--;
+                tampilkanSoal();
+            }
         }
 
         function selesaiKuis() {
-            // Kalkulasi skor final absolut
             let persentaseSkor = Math.round((skorMentah / kuisArray.length) * 100);
             let skorAkhir = Math.min(persentaseSkor, SKOR_MAKSIMAL);
 
-            // 1. Ubah tombol menjadi mode loading
             const btnSelesai = document.getElementById('btnSelesai');
             btnSelesai.innerText = "Menyimpan Data...";
             btnSelesai.disabled = true;
 
-            // 2. Simpan ke localStorage Global (Komunikasi dengan rekap.html)
+            hapusProgres();
+
             const dataRekap = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
             dataRekap.push({
                 nama: namaUser,
                 kelas: kelasUser,
-                mapel: KODE_MAPEL, // <-- DIKEMBALIKAN KE KODE_MAPEL AGAR MUNCUL DI LAYAR DEPAN
+                mapel: KODE_MAPEL,
                 nilai: skorAkhir,
                 waktu: new Date().toLocaleString('id-ID')
             });
             localStorage.setItem(STORAGE_KEY, JSON.stringify(dataRekap));
 
-            // 3. KIRIM DATA KE GOOGLE SHEETS GURU
             const scriptURL = 'https://script.google.com/macros/s/AKfycbwzCsI_5uv5jreQHSiNW5Dej7Iu-5Sui0uYhwIWGFwcsm8kM09C20JMwjDO8ZZRMGAs/exec'; 
             
             const payload = {
                 nama: namaUser,
                 kelas: kelasUser,
-                mapel: "IPAS", // <-- TETAP "IPAS" AGAR RAPI DI GOOGLE SHEETS
+                mapel: "IPAS", 
                 nilai: skorAkhir
             };
 

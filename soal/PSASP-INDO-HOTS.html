@@ -152,11 +152,14 @@
             font-size: 1.2em;
             font-weight: bold;
             margin-bottom: 20px;
+            white-space: pre-wrap; /* Agar paragraf teks tertata rapi */
         }
 
         .question-image {
             width: 100%;
             max-width: 400px;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
             display: block;
             margin: 0 auto 20px auto;
             border-radius: 8px;
@@ -180,8 +183,8 @@
         }
 
         .option:hover { background: #e3f2fd; border-color: var(--blue); }
-        .option.correct { background: var(--primary); color: white; border-color: var(--primary); }
-        .option.incorrect { background: var(--danger); color: white; border-color: var(--danger); }
+        .option.correct { background: var(--primary) !important; color: white !important; border-color: var(--primary) !important; }
+        .option.incorrect { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
         .option.disabled { pointer-events: none; }
 
         .pembahasan {
@@ -262,7 +265,7 @@
         <button onclick="window.location.href='../index.html'" style="background-color: var(--secondary);">Kembali ke Home Luar</button>
 
         <div class="history-section">
-            <h3>Riwayat Pengerjaan Anda</h3>
+            <h3>Riwayat Pengerjaan Anda (Lokal)</h3>
             <table>
                 <thead>
                     <tr>
@@ -273,7 +276,7 @@
                     </tr>
                 </thead>
                 <tbody id="history-table-body">
-                    </tbody>
+                </tbody>
             </table>
         </div>
     </div>
@@ -285,13 +288,14 @@
             <span class="badge-kelas" id="teksKelas">Kelas: -</span>
         </div>
 
-        <div class="score-display" style="display: none;">Skor Sementara: <span id="temp-score">0</span></div>
+        <div class="score-display">Skor Sementara: <span id="temp-score">0</span></div>
+        <div style="font-weight: bold; margin-bottom: 10px; color: var(--blue);">Soal: <span id="soal-counter">1</span> / <span id="total-soal">35</span></div>
         
         <div id="question-container">
             <h3 class="question-text" id="question-text">Teks Soal</h3>
             <img id="question-image" class="question-image hidden" src="" alt="Gambar Soal">
             <div class="options" id="options-container">
-                </div>
+            </div>
         </div>
 
         <div id="pembahasan" class="pembahasan">
@@ -312,20 +316,22 @@
     </div>
 
     <div class="footer">
-        &copy; 2026 Dwi Endrasto | dibuat dengan ❤️ untuk generasi cerdas bangsa.
+        &copy; <span id="tahun-sekarang"></span> | Oleh : Dwi Endrasto | dibuat dengan ❤️ untuk generasi cerdas bangsa.
     </div>
 </div>
 
 <script>
 // ==========================================
-// KEAMANAN HALAMAN
+// DINAMIS TAHUN & KEAMANAN
 // ==========================================
-document.addEventListener('contextmenu', event => event.preventDefault()); // Anti Klik Kanan
+document.getElementById('tahun-sekarang').innerText = new Date().getFullYear();
+
+document.addEventListener('contextmenu', event => event.preventDefault()); 
 document.onkeydown = function(e) {
-    if(e.keyCode == 123) return false; // F12
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Ctrl+Shift+I
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; // Ctrl+Shift+J
-    if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
+    if(e.keyCode == 123) return false; 
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; 
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; 
+    if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; 
 }
 
 // ==========================================
@@ -333,21 +339,19 @@ document.onkeydown = function(e) {
 // ==========================================
 const bankSoal = [
     {
-        // Soal 1: Fakta/Opini (Kisi-kisi No. 6)
         gambar: "gambar/pencemaran.jpg",
         keterangan: "Gambar sungai yang penuh tumpukan sampah plastik dan limbah.",
         pertanyaan: "Berdasarkan gambar tersebut, manakah pernyataan yang merupakan sebuah opini?",
         pilihan: [
-            "Sampah plastik itu sangat mengganggu pemandangan mata.", // Opini
-            "Sungai tersebut dipenuhi oleh banyak sampah berbahan plastik.", // Fakta
-            "Terdapat berbagai botol bekas mengapung di permukaan air.", // Fakta
-            "Aliran air sungai menjadi terhambat oleh tumpukan sampah." // Fakta
+            "Sampah plastik itu sangat mengganggu pemandangan mata.", 
+            "Sungai tersebut dipenuhi oleh banyak sampah berbahan plastik.", 
+            "Terdapat berbagai botol bekas mengapung di permukaan air.", 
+            "Aliran air sungai menjadi terhambat oleh tumpukan sampah." 
         ],
         jawabanBenar: 0,
         pembahasan: "Opini adalah pendapat yang bersifat subjektif. 'Sangat mengganggu pemandangan' adalah penilaian seseorang, sedangkan pilihan lain adalah fakta yang terlihat di gambar."
     },
     {
-        // Soal 2: Infografik (Kisi-kisi No. 12)
         gambar: "gambar/infografik_dbd.jpg",
         keterangan: "Infografik tentang langkah 3M Plus untuk mencegah penyakit Demam Berdarah.",
         pertanyaan: "Tindakan pencegahan utama yang paling dianjurkan oleh infografik tersebut adalah...",
@@ -361,7 +365,6 @@ const bankSoal = [
         pembahasan: "Sesuai dengan kampanye 3M Plus pada infografik kesehatan, pencegahan DBD dilakukan dengan Menguras, Menutup, dan Mendaur ulang (dulu Mengubur) barang bekas tempat nyamuk bertelur."
     },
     {
-        // Soal 3: Kuitansi (Kisi-kisi No. 29)
         gambar: "gambar/kuitansi_buku.jpg",
         keterangan: "Gambar format kuitansi pembayaran pembelian buku pelajaran sekolah.",
         pertanyaan: "Informasi krusial yang wajib tercantum dalam dokumen transaksi tersebut adalah...",
@@ -375,7 +378,6 @@ const bankSoal = [
         pembahasan: "Sebuah kuitansi yang sah sebagai bukti pembayaran harus memuat nama pembayar, jumlah uang (angka dan terbilang), tujuan pembayaran, tempat/tanggal, dan tanda tangan penerima."
     },
     {
-        // Soal 4: Iklan (Kisi-kisi No. 33)
         gambar: "gambar/iklan_gigi.jpg",
         keterangan: "Iklan produk pasta gigi dengan klaim mampu memutihkan gigi dalam waktu 7 hari.",
         pertanyaan: "Pesan persuasif utama yang ingin disampaikan oleh pembuat iklan tersebut adalah...",
@@ -389,7 +391,6 @@ const bankSoal = [
         pembahasan: "Kalimat persuasif dalam iklan bertujuan mengajak konsumen. Klaim 'memutihkan dalam 7 hari' adalah bujukan (persuasi) agar orang membeli produk tersebut karena manfaat cepatnya."
     },
     {
-        // Soal 5: Unsur Intrinsik / Majas (Kisi-kisi No. 14 / 16)
         gambar: "gambar/suasana_hutan.jpg",
         keterangan: "Gambar hutan yang sangat rimbun, gelap, dan sunyi di tengah malam.",
         pertanyaan: "Majas personifikasi yang paling tepat untuk mendeskripsikan suasana gambar adalah...",
@@ -403,7 +404,6 @@ const bankSoal = [
         pembahasan: "Majas personifikasi mengumpamakan benda mati seolah memiliki sifat manusia. 'Angin berbisik' memberikan sifat manusia (berbisik) pada angin."
     },
     {
-        // Soal 6: Ide Pokok Paragraf
         gambar: "",
         keterangan: "",
         pertanyaan: "Bacalah teks berikut!\nBunga bangkai (Amorphophallus titanum) merupakan tumbuhan endemik Sumatera yang terancam punah. Habitat aslinya di hutan hujan tropis semakin berkurang akibat pembalakan liar dan alih fungsi lahan menjadi perkebunan. Selain itu, banyak masyarakat yang merusaknya karena mengira tumbuhan ini sama dengan parasit Rafflesia arnoldii.\n\nIde pokok paragraf tersebut adalah...",
@@ -417,7 +417,6 @@ const bankSoal = [
         pembahasan: "Ide pokok adalah gagasan utama sebuah paragraf. Keseluruhan kalimat dalam teks tersebut membahas tentang alasan atau penyebab mengapa bunga bangkai terancam punah."
     },
     {
-        // Soal 7: Simpulan Teks Eksplanasi
         gambar: "",
         keterangan: "",
         pertanyaan: "Penggunaan energi alternatif seperti panel surya mulai banyak diterapkan di berbagai perumahan modern. Selain ramah lingkungan karena tidak menghasilkan emisi gas rumah kaca, tagihan listrik jangka panjang juga menjadi lebih hemat. Namun, biaya pemasangan awalnya memang membutuhkan dana yang cukup besar.\n\nSimpulan yang tepat dari teks di atas adalah...",
@@ -431,7 +430,6 @@ const bankSoal = [
         pembahasan: "Simpulan merangkum seluruh isi teks. Teks membahas kelebihan (ramah lingkungan, hemat) dan kekurangan (biaya awal mahal) dari panel surya, yang terangkum pada pilihan C."
     },
     {
-        // Soal 8: Makna Kata/Istilah
         gambar: "",
         keterangan: "",
         pertanyaan: "Pemerintah daerah menggalakkan program reboisasi di kawasan hulu sungai untuk mencegah bencana banjir bandang saat musim penghujan tiba.\n\nMakna istilah 'reboisasi' pada kalimat tersebut adalah...",
@@ -445,7 +443,6 @@ const bankSoal = [
         pembahasan: "Dalam Kamus Besar Bahasa Indonesia (KBBI), reboisasi berarti penanaman kembali hutan yang telah ditebang/tandus."
     },
     {
-        // Soal 9: Amanat Cerita Fiksi
         gambar: "",
         keterangan: "",
         pertanyaan: "Kancil menatap sedih kura-kura yang tertinggal jauh di belakang. Meski Kancil bisa berlari sangat cepat, ia menyadari kesombongannya telah melukai hati temannya itu. Kancil pun berbalik arah, menghampiri kura-kura, dan berjalan beriringan bersamanya menuju garis akhir.\n\nAmanat yang terkandung dalam kutipan fabel tersebut adalah...",
@@ -459,7 +456,6 @@ const bankSoal = [
         pembahasan: "Amanat adalah pesan moral. Dari penyesalan Kancil, kita belajar untuk tidak sombong atas kelebihan kita dan tetap menghargai orang lain."
     },
     {
-        // Soal 10: Teks Prosedur Rumpang
         gambar: "",
         keterangan: "",
         pertanyaan: "Cara Membuat Teh Manis Hangat:\n(1) Siapkan gelas, teh celup, gula pasir, dan air panas.\n(2) Masukkan teh celup ke dalam gelas.\n(3) [...]\n(4) Tambahkan gula pasir secukupnya lalu aduk hingga larut.\n(5) Teh manis hangat siap dinikmati.\n\nKalimat yang tepat untuk melengkapi bagian rumpang nomor (3) adalah...",
@@ -473,7 +469,6 @@ const bankSoal = [
         pembahasan: "Dalam urutan membuat teh, setelah teh celup dimasukkan ke gelas, langkah logis selanjutnya adalah menuangkan air panas agar teh bisa diseduh."
     },
     {
-        // Soal 11: Jenis Paragraf
         gambar: "",
         keterangan: "",
         pertanyaan: "Menjaga kesehatan gigi sangatlah penting. Kita dianjurkan menyikat gigi minimal dua kali sehari, yaitu setelah sarapan dan sebelum tidur. Selain itu, mengurangi makanan manis juga dapat mencegah gigi berlubang. Rutin memeriksakan gigi ke dokter setiap enam bulan sekali juga menjadi langkah perawatan yang tak boleh dilewatkan.\n\nBerdasarkan letak kalimat utamanya, teks tersebut termasuk jenis paragraf...",
@@ -487,7 +482,6 @@ const bankSoal = [
         pembahasan: "Paragraf deduktif memiliki kalimat utama di awal paragraf (Menjaga kesehatan gigi sangatlah penting), diikuti oleh kalimat-kalimat penjelas."
     },
     {
-        // Soal 12: Memprediksi Kejadian
         gambar: "",
         keterangan: "",
         pertanyaan: "Bagas sangat suka bermain gim di ponsel cerdasnya. Setiap malam ia baru tidur setelah lewat tengah malam. Keesokan paginya, Bagas sering terburu-buru berangkat ke sekolah tanpa sarapan.\n\nPrediksi kejadian yang paling mungkin dialami Bagas jika kebiasaan ini diteruskan adalah...",
@@ -501,7 +495,6 @@ const bankSoal = [
         pembahasan: "Prediksi logis dari kurang tidur dan tidak sarapan adalah berdampak langsung pada penurunan kondisi fisik (kesehatan) dan fokus (konsentrasi di sekolah)."
     },
     {
-        // Soal 13: Melengkapi Pantun
         gambar: "",
         keterangan: "",
         pertanyaan: "Pergi ke pasar membeli batik,\nBatik dibeli motifnya langka.\n[...]\n[...]\n\nBaris isi yang tepat untuk melengkapi pantun di atas agar bersajak a-b-a-b adalah...",
@@ -515,7 +508,6 @@ const bankSoal = [
         pembahasan: "Pantun bersajak a-b-a-b. Baris 1 (batik -> ik) harus sama rima dengan baris 3 (baik -> ik). Baris 2 (langka -> ka/a) harus sama rima dengan baris 4 (manusia -> a). Pilihan B paling tepat secara rima dan makna."
     },
     {
-        // Soal 14: Kalimat Efektif (Kisi-kisi No. 30)
         gambar: "",
         keterangan: "",
         pertanyaan: "Perhatikan kalimat berikut: 'Para siswa-siswi sedang melaksanakan upacara bendera di lapangan sekolah.'\n\nPerbaikan kalimat tersebut agar menjadi kalimat yang efektif adalah...",
@@ -529,7 +521,6 @@ const bankSoal = [
         pembahasan: "Kata 'para' bermakna jamak (banyak), dan 'siswa-siswi' juga bermakna jamak. Penggunaan keduanya secara bersamaan adalah pemborosan kata. Sebaiknya gunakan 'Para siswa' atau 'Siswa-siswi'."
     },
     {
-        // Soal 15: Daftar Pustaka (Kisi-kisi No. 31)
         gambar: "",
         keterangan: "",
         pertanyaan: "Buku berjudul 'Laskar Pelangi' ditulis oleh Andrea Hirata. Buku ini diterbitkan oleh Bentang Pustaka di kota Yogyakarta pada tahun 2005.\n\nPenulisan daftar pustaka yang benar berdasarkan data tersebut adalah...",
@@ -543,7 +534,6 @@ const bankSoal = [
         pembahasan: "Format daftar pustaka: Nama Belakang, Nama Depan. Tahun terbit. Judul Buku (dicetak miring). Kota Terbit: Penerbit."
     },
     {
-        // Soal 16: Resensi Buku (Kisi-kisi No. 32)
         gambar: "",
         keterangan: "",
         pertanyaan: "Kutipan resensi: 'Buku ini menyajikan petualangan yang sangat seru dengan gaya bahasa yang mudah dipahami anak-anak. Sayangnya, kualitas kertas yang digunakan tipis sehingga mudah robek.'\n\nBerdasarkan resensi tersebut, kelemahan dari buku itu adalah...",
@@ -557,7 +547,6 @@ const bankSoal = [
         pembahasan: "Kelemahan atau kekurangan buku secara eksplisit disebutkan pada kalimat kedua, yaitu 'kualitas kertas yang digunakan tipis sehingga mudah robek'."
     },
     {
-        // Soal 17: Biografi Tokoh (Kisi-kisi No. 34)
         gambar: "",
         keterangan: "",
         pertanyaan: "B.J. Habibie dikenal sebagai Bapak Teknologi Indonesia. Meski sempat belajar dan bekerja di Jerman dengan fasilitas mewah, beliau rela kembali ke Indonesia demi membangun industri kedirgantaraan (pesawat terbang) nasional.\n\nKeteladanan tokoh yang dapat kita ambil dari kutipan biografi di atas adalah...",
@@ -571,7 +560,6 @@ const bankSoal = [
         pembahasan: "Sikap keteladanan adalah sikap baik yang patut dicontoh. Rela kembali dari posisi nyaman di Jerman untuk membangun negaranya menunjukkan rasa nasionalisme (cinta tanah air)."
     },
     {
-        // Soal 18: Kalimat Persuasif pada Pidato
         gambar: "",
         keterangan: "",
         pertanyaan: "Dalam rangka memperingati Hari Bumi, ketua panitia menyampaikan pidato. Kalimat persuasif (ajakan) yang paling tepat menutup pidato tersebut adalah...",
@@ -585,7 +573,6 @@ const bankSoal = [
         pembahasan: "Kalimat persuasif bersifat mengajak atau menghimbau. Penggunaan kata 'marilah' merupakan ciri khas kalimat ajakan dalam sebuah pidato."
     },
     {
-        // Soal 19: Bagian Surat Resmi
         gambar: "",
         keterangan: "",
         pertanyaan: "Perhatikan bagian surat berikut!\n'Dengan hormat,\nSehubungan dengan akan diadakannya kegiatan perkemahan akhir tahun, kami mengharap kehadiran Bapak/Ibu wali murid pada...'\n\nKutipan di atas merupakan bagian surat resmi, yaitu...",
@@ -599,7 +586,6 @@ const bankSoal = [
         pembahasan: "Meskipun ada frasa 'Dengan hormat' (salam pembuka), kalimat utamanya menjelaskan maksud dan tujuan surat (membahas perkemahan), sehingga ini masuk ke bagian Isi Surat."
     },
     {
-        // Soal 20: Sinonim
         gambar: "",
         keterangan: "",
         pertanyaan: "Penggunaan pupuk kimia secara terus-menerus akan berdampak **signifikan** terhadap penurunan kualitas kesuburan tanah.\n\nSinonim dari kata yang dicetak tebal adalah...",
@@ -613,7 +599,6 @@ const bankSoal = [
         pembahasan: "Signifikan berarti penting, berarti, atau memberikan dampak yang nyata."
     },
     {
-        // Soal 21: Kosakata Baku
         gambar: "",
         keterangan: "",
         pertanyaan: "Penulisan kata baku yang tepat pada kalimat di bawah ini adalah...",
@@ -627,7 +612,6 @@ const bankSoal = [
         pembahasan: "Penulisan baku: apotek (bukan apotik), aktivitas (bukan aktifitas), sistem (baku), menasihati (bukan menasehati)."
     },
     {
-        // Soal 22: Penggunaan Tanda Baca
         gambar: "",
         keterangan: "",
         pertanyaan: "Ibu membeli berbagai macam sayuran bayam kangkung dan wortel di pasar\n\nPenggunaan tanda baca yang tepat untuk kalimat di atas adalah...",
@@ -641,7 +625,6 @@ const bankSoal = [
         pembahasan: "Tanda titik dua (:) digunakan pada akhir suatu pernyataan lengkap yang diikuti pemerincian. Tanda koma (,) digunakan di antara unsur-unsur dalam suatu perincian."
     },
     {
-        // Soal 23: Penggunaan Imbuhan
         gambar: "",
         keterangan: "",
         pertanyaan: "Kata dasar 'sapu' jika diberi awalan 'me-' akan berubah menjadi...",
@@ -655,7 +638,6 @@ const bankSoal = [
         pembahasan: "Berdasarkan kaidah peluluhan bunyi awalan meN-, kata dasar yang berawalan huruf K, P, T, S akan luluh jika mendapat awalan me-. Sapu menjadi menyapu."
     },
     {
-        // Soal 24: Antonim
         gambar: "",
         keterangan: "",
         pertanyaan: "Sungai di desa kami memiliki aliran air yang sangat **deras** setelah hujan lebat semalaman.\n\nAntonim (lawan kata) dari kata yang dicetak tebal adalah...",
@@ -669,7 +651,6 @@ const bankSoal = [
         pembahasan: "Deras berarti mengalir dengan cepat dan kuat. Lawan kata yang paling tepat untuk aliran air yang deras adalah tenang."
     },
     {
-        // Soal 25: Teks Laporan Hasil Observasi
         gambar: "",
         keterangan: "",
         pertanyaan: "Ciri utama dari teks laporan hasil observasi adalah...",
@@ -683,7 +664,6 @@ const bankSoal = [
         pembahasan: "Teks Laporan Hasil Observasi (LHO) adalah teks yang memberikan informasi secara umum tentang sesuatu berdasarkan fakta dari hasil pengamatan secara langsung."
     },
     {
-        // Soal 26: Makna Kiasan Puisi
         gambar: "",
         keterangan: "",
         pertanyaan: "Pahlawanku...\nEngkau rela mandi darah\nDemi merebut kemerdekaan\n\nMakna kiasan 'mandi darah' pada kutipan puisi di atas adalah...",
@@ -697,7 +677,6 @@ const bankSoal = [
         pembahasan: "Mandi darah adalah ungkapan/kiasan yang menggambarkan kondisi seseorang yang terluka sangat parah hingga sekujur tubuhnya berlumuran darah di medan perang."
     },
     {
-        // Soal 27: Akronim
         gambar: "",
         keterangan: "",
         pertanyaan: "Puskesmas merupakan fasilitas pelayanan kesehatan yang menyelenggarakan upaya kesehatan masyarakat. Kata 'Puskesmas' merupakan akronim dari...",
@@ -711,7 +690,6 @@ const bankSoal = [
         pembahasan: "Puskesmas adalah akronim baku dari Pusat Kesehatan Masyarakat."
     },
     {
-        // Soal 28: Kalimat Tanya untuk Wawancara
         gambar: "",
         keterangan: "",
         pertanyaan: "Kamu akan mewawancarai seorang petugas kebersihan sekolah tentang cara memilah sampah. Kalimat tanya yang paling tepat adalah...",
@@ -725,7 +703,6 @@ const bankSoal = [
         pembahasan: "Pertanyaan wawancara harus sesuai dengan topik. Karena topiknya tentang 'cara memilah sampah', pertanyaan yang berfokus pada alasan/proses pemisahan sampah adalah yang paling relevan."
     },
     {
-        // Soal 29: Formulir Pengiriman Barang
         gambar: "",
         keterangan: "",
         pertanyaan: "Dalam mengisi formulir pengiriman paket barang, data yang paling krusial (penting) dan tidak boleh salah tulis agar barang tidak nyasar adalah...",
@@ -739,7 +716,6 @@ const bankSoal = [
         pembahasan: "Fungsi utama formulir pengiriman adalah untuk memastikan kurir dapat mengantar barang ke tujuan. Oleh karena itu, alamat lengkap penerima dan kode pos adalah informasi yang paling mutlak kebenarannya."
     },
     {
-        // Soal 30: Menentukan Watak Tokoh
         gambar: "",
         keterangan: "",
         pertanyaan: "Meskipun Dita berasal dari keluarga kaya, ia tidak pernah memamerkan barang-barang mewahnya di sekolah. Ia selalu meminjamkan alat tulisnya kepada teman yang tidak punya dan sering berbagi bekal makanannya.\n\nWatak tokoh Dita pada cerita tersebut adalah...",
@@ -753,7 +729,6 @@ const bankSoal = [
         pembahasan: "Tidak memamerkan kekayaan adalah ciri sikap rendah hati, sedangkan suka meminjamkan alat tulis dan berbagi bekal adalah ciri sikap dermawan."
     },
     {
-        // Soal 31: Paragraf Persuasi
         gambar: "",
         keterangan: "",
         pertanyaan: "Penggunaan plastik sekali pakai sudah mencapai tingkat yang mengkhawatirkan. Limbah plastik merusak ekosistem laut dan membunuh jutaan hewan laut setiap tahunnya. [...]\n\nKalimat yang tepat untuk melengkapi paragraf persuasi tersebut adalah...",
@@ -767,7 +742,6 @@ const bankSoal = [
         pembahasan: "Teks persuasi bertujuan mengajak. Kalimat 'mari kita beralih membawa tas belanja sendiri' merupakan ajakan yang logis sebagai solusi dari permasalahan limbah plastik sekali pakai."
     },
     {
-        // Soal 32: Kata Hubung (Konjungsi)
         gambar: "",
         keterangan: "",
         pertanyaan: "Rio tidak masuk sekolah hari ini [...] ia sedang dirawat di rumah sakit akibat gejala demam berdarah.\n\nKata hubung yang tepat untuk melengkapi kalimat majemuk di atas adalah...",
@@ -781,7 +755,6 @@ const bankSoal = [
         pembahasan: "Kalimat tersebut menunjukkan hubungan sebab-akibat. Rio tidak masuk sekolah (akibat) *karena* ia sedang dirawat di rumah sakit (sebab)."
     },
     {
-        // Soal 33: Teks Petunjuk Penggunaan
         gambar: "",
         keterangan: "",
         pertanyaan: "Petunjuk Penggunaan Masker Medis:\n1. Cuci tangan sebelum memakai masker.\n2. Kaitkan tali masker pada telinga.\n3. Tekan kawat pada bagian hidung agar rapat.\n4. Tarik bagian bawah masker hingga menutup dagu.\n\nTujuan dari langkah nomor 3 adalah...",
@@ -795,7 +768,6 @@ const bankSoal = [
         pembahasan: "Menekan kawat pada bagian hidung berfungsi untuk menutup rongga atau celah antara hidung dan pipi sehingga mencegah partikel virus atau polusi terhirup."
     },
     {
-        // Soal 34: Mengubah Puisi ke Prosa (Parafrase)
         gambar: "",
         keterangan: "",
         pertanyaan: "Mentari pagi menyapa hangat\nBurung berkicau riang gembira\nLekaslah bangun kawan\nRaih mimpimu di hari ini\n\nBentuk prosa (cerita) yang tepat dari puisi di atas adalah...",
@@ -809,7 +781,6 @@ const bankSoal = [
         pembahasan: "Parafrase adalah mengubah puisi menjadi prosa tanpa mengubah maknanya. Pilihan B merangkum suasana pagi yang hangat, kicau burung, dan ajakan untuk bangun mengejar mimpi."
     },
     {
-        // Soal 35: Latar Waktu Cerita
         gambar: "",
         keterangan: "",
         pertanyaan: "Lampu-lampu jalan mulai menyala menggantikan terang matahari yang perlahan tenggelam di ufuk barat. Suara jangkrik bersahutan memecah kesunyian desa. Ayah baru saja mengayuh sepedanya memasuki pekarangan rumah setelah seharian bekerja di sawah.\n\nLatar waktu pada kutipan cerita tersebut adalah...",
@@ -822,17 +793,16 @@ const bankSoal = [
         jawabanBenar: 2,
         pembahasan: "Frasa 'matahari yang perlahan tenggelam di ufuk barat' dan 'lampu-lampu jalan mulai menyala' dengan sangat jelas menunjukkan waktu sore hari menuju malam (senja/magrib)."
     }
-
-    // Catatan untuk Bapak Dwi: Silakan tambahkan 30 soal lainnya di sini mengikuti format di atas agar mencapai total 35 soal.
 ];
 
 // ==========================================
-// STATE MANAGEMENT & LIMITER
+// STATE MANAGEMENT & SESSION
 // ==========================================
 let soalAcak = [];
 let indeksSaatIni = 0;
-let jawabanUser = []; // Menyimpan status benar/salah tiap nomor
+let jawabanUser = []; 
 let dataSiswa = { nama: "", kelas: "" };
+const KEY_SESSION = "sbs_active_session_INDO";
 
 // ==========================================
 // FUNGSI UTAMA
@@ -843,20 +813,22 @@ function muatRiwayat() {
     const tbody = document.getElementById('history-table-body');
     tbody.innerHTML = '';
     
-    if (dataRekap.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Belum ada riwayat.</td></tr>';
+    // Filter mapel hanya Bahasa Indonesia
+    const riwayatIndo = dataRekap.filter(d => d.mapel === "Bahasa Indonesia");
+
+    if (riwayatIndo.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Belum ada riwayat pengerjaan.</td></tr>';
         return;
     }
 
-    // Tampilkan 5 riwayat terakhir di login screen
-    const riwayatTampil = dataRekap.slice(-5).reverse();
+    const riwayatTampil = riwayatIndo.slice(-5).reverse();
     riwayatTampil.forEach(data => {
         tbody.innerHTML += `
             <tr>
                 <td>${data.nama}</td>
                 <td>${data.kelas}</td>
-                <td>${data.waktu}</td>
-                <td><strong>${data.nilai}</strong></td>
+                <td><small>${data.waktu}</small></td>
+                <td style="color:var(--primary);"><strong>${data.nilai}</strong></td>
             </tr>
         `;
     });
@@ -871,6 +843,21 @@ function acakArray(array) {
     return arr;
 }
 
+// Fungsi Simpan Progres
+function simpanProgres() {
+    const sesiAktif = {
+        dataSiswa,
+        soalAcak,
+        indeksSaatIni,
+        jawabanUser
+    };
+    localStorage.setItem(KEY_SESSION, JSON.stringify(sesiAktif));
+}
+
+function hapusProgres() {
+    localStorage.removeItem(KEY_SESSION);
+}
+
 function mulaiKuis() {
     const inputNama = document.getElementById('nama').value.trim();
     const inputKelas = document.getElementById('kelas').value.trim();
@@ -880,12 +867,27 @@ function mulaiKuis() {
         return;
     }
 
+    // CEK SESI TERTUNDA
+    const sesiTersimpan = JSON.parse(localStorage.getItem(KEY_SESSION));
+    if (sesiTersimpan && sesiTersimpan.dataSiswa.nama.toLowerCase() === inputNama.toLowerCase() && sesiTersimpan.dataSiswa.kelas.toLowerCase() === inputKelas.toLowerCase()) {
+        if (confirm(`Halo ${inputNama}, kamu memiliki kuis yang belum selesai dikerjakan.\nIngin melanjutkan dari soal terakhir tanpa kehilangan nilaimu?`)) {
+            // Restore Sesi
+            dataSiswa = sesiTersimpan.dataSiswa;
+            soalAcak = sesiTersimpan.soalAcak;
+            indeksSaatIni = sesiTersimpan.indeksSaatIni;
+            jawabanUser = sesiTersimpan.jawabanUser;
+            siapkanLayarKuis();
+            return;
+        } else {
+            hapusProgres(); // Reset jika menolak
+        }
+    }
+
+    // MULAI SESI BARU
     dataSiswa.nama = inputNama;
     dataSiswa.kelas = inputKelas;
 
-    // Persiapan Variabel (Flagging & Reset)
     soalAcak = acakArray(bankSoal);
-    // Acak posisi pilihan ganda pada tiap soal
     soalAcak = soalAcak.map(soal => {
         let pilihanDenganIndexAsli = soal.pilihan.map((teks, index) => ({ teks, isCorrect: index === soal.jawabanBenar }));
         pilihanDenganIndexAsli = acakArray(pilihanDenganIndexAsli);
@@ -894,33 +896,36 @@ function mulaiKuis() {
 
     indeksSaatIni = 0;
     jawabanUser = new Array(soalAcak.length).fill(null); 
+    
+    siapkanLayarKuis();
+}
 
-    // Ganti View
+function siapkanLayarKuis() {
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('quiz-screen').classList.remove('hidden');
     document.getElementById('headerHomeBtn').classList.remove('hidden');
 
-    // Menampilkan nama dan kelas di Profile Bar
     document.getElementById('teksNama').innerHTML = `👤 <strong>${dataSiswa.nama.toUpperCase()}</strong>`;
     document.getElementById('teksKelas').innerText = `Kelas: ${dataSiswa.kelas}`;
+    document.getElementById('total-soal').innerText = soalAcak.length;
 
     tampilkanSoal();
     hitungSkorSementara();
 }
 
 function goHome() {
-    if(confirm("Apakah Anda yakin ingin keluar? Progres kuis tidak akan tersimpan.")) {
+    if(confirm("Apakah Anda yakin ingin ke beranda? Progres sementara Anda tetap aman dan bisa dilanjutkan nanti.")) {
         window.location.reload();
     }
 }
 
 function tampilkanSoal() {
+    simpanProgres(); // Simpan state saat berpindah soal
+
     const soal = soalAcak[indeksSaatIni];
-    
-    // Set Teks Soal
+    document.getElementById('soal-counter').innerText = indeksSaatIni + 1;
     document.getElementById('question-text').innerText = `${indeksSaatIni + 1}. ${soal.pertanyaan}`;
     
-    // Set Gambar Soal (jika ada)
     const imgEl = document.getElementById('question-image');
     if (soal.gambar) {
         imgEl.src = soal.gambar;
@@ -930,7 +935,6 @@ function tampilkanSoal() {
         imgEl.classList.add('hidden');
     }
 
-    // Render Pilihan
     const optionsContainer = document.getElementById('options-container');
     optionsContainer.innerHTML = '';
     
@@ -939,11 +943,14 @@ function tampilkanSoal() {
         div.className = 'option';
         div.innerText = `${String.fromCharCode(65 + index)}. ${pil.teks}`;
         
-        // Cek jika sudah dijawab
+        // Pengecekan status terjawab berdasarkan array restore
         if (jawabanUser[indeksSaatIni] !== null) {
             div.classList.add('disabled');
-            if (pil.isCorrect) div.classList.add('correct');
-            else if (jawabanUser[indeksSaatIni] === index) div.classList.add('incorrect');
+            if (pil.isCorrect) {
+                div.classList.add('correct');
+            } else if (jawabanUser[indeksSaatIni].terpilihIndex === index) {
+                div.classList.add('incorrect');
+            }
         } else {
             div.onclick = () => pilihJawaban(index, pil.isCorrect, div);
         }
@@ -951,7 +958,6 @@ function tampilkanSoal() {
         optionsContainer.appendChild(div);
     });
 
-    // Kontrol Visibilitas Pembahasan & Navigasi
     const pembahasanEl = document.getElementById('pembahasan');
     if (jawabanUser[indeksSaatIni] !== null) {
         document.getElementById('teks-pembahasan').innerText = soal.pembahasan;
@@ -961,29 +967,31 @@ function tampilkanSoal() {
     }
 
     document.getElementById('btn-prev').style.display = indeksSaatIni > 0 ? 'inline-block' : 'none';
-    document.getElementById('btn-next').style.display = 'inline-block';
     
-    if (indeksSaatIni === soalAcak.length - 1 && jawabanUser[indeksSaatIni] !== null) {
-        document.getElementById('btn-next').innerText = "Selesai Kuis";
-        document.getElementById('btn-next').onclick = selesaikanKuis;
-    } else {
-        document.getElementById('btn-next').innerText = "Selanjutnya \u2192";
-        document.getElementById('btn-next').onclick = soalSelanjutnya;
-        if(jawabanUser[indeksSaatIni] === null) {
-             document.getElementById('btn-next').style.display = 'none'; // Sembunyikan Next sebelum dijawab
+    // Logika Navigasi "Selanjutnya"
+    const btnNext = document.getElementById('btn-next');
+    if (jawabanUser[indeksSaatIni] !== null) {
+        btnNext.style.display = 'inline-block';
+        if (indeksSaatIni === soalAcak.length - 1) {
+            btnNext.innerText = "Selesai Kuis";
+            btnNext.onclick = selesaikanKuis;
+        } else {
+            btnNext.innerText = "Selanjutnya \u2192";
+            btnNext.onclick = soalSelanjutnya;
         }
+    } else {
+        btnNext.style.display = 'none'; // Paksa jawab dulu
     }
 }
 
 function pilihJawaban(indexPilihan, isCorrect, divElemen) {
-    if (jawabanUser[indeksSaatIni] !== null) return; // Proteksi ganda
+    if (jawabanUser[indeksSaatIni] !== null) return; 
 
     jawabanUser[indeksSaatIni] = {
         terpilihIndex: indexPilihan,
         benar: isCorrect
     };
 
-    // Warnai Pilihan
     const semuaOpsi = document.querySelectorAll('.option');
     semuaOpsi.forEach((opsi, idx) => {
         opsi.classList.add('disabled');
@@ -996,18 +1004,20 @@ function pilihJawaban(indexPilihan, isCorrect, divElemen) {
         divElemen.classList.add('incorrect');
     }
 
-    // Tampilkan Pembahasan
     document.getElementById('teks-pembahasan').innerText = soalAcak[indeksSaatIni].pembahasan;
     document.getElementById('pembahasan').style.display = 'block';
 
     hitungSkorSementara();
+    simpanProgres(); // Update progres setelah menjawab
     
-    // Tampilkan Tombol Next/Selesai
     const btnNext = document.getElementById('btn-next');
     btnNext.style.display = 'inline-block';
     if (indeksSaatIni === soalAcak.length - 1) {
         btnNext.innerText = "Selesai Kuis";
         btnNext.onclick = selesaikanKuis;
+    } else {
+        btnNext.innerText = "Selanjutnya \u2192";
+        btnNext.onclick = soalSelanjutnya;
     }
 }
 
@@ -1026,11 +1036,9 @@ function soalSebelumnya() {
 }
 
 function hitungSkorSementara() {
-    // LIMITER LOGIC: Menghitung ulang berdasarkan array state, bukan akumulasi sederhana
     const jumlahBenar = jawabanUser.filter(jawab => jawab && jawab.benar === true).length;
     let persentase = Math.round((jumlahBenar / soalAcak.length) * 100);
     
-    // Hard Limiter memastikan skor mentok di 100
     if (persentase > 100) persentase = 100;
     
     document.getElementById('temp-score').innerText = persentase;
@@ -1040,16 +1048,16 @@ function hitungSkorSementara() {
 function selesaikanKuis() {
     const finalScore = hitungSkorSementara();
     
-    // Ubah tombol menjadi mode loading
     const btnSelesai = document.getElementById('btn-next');
     btnSelesai.innerText = "Menyimpan Data...";
     btnSelesai.disabled = true;
     
-    // Format Waktu
+    // Hapus sesi karena kuis sudah selesai
+    hapusProgres();
+
     const sekarang = new Date();
     const waktuFormat = `${sekarang.getDate()}/${sekarang.getMonth()+1}/${sekarang.getFullYear()} ${sekarang.getHours()}:${sekarang.getMinutes()}`;
 
-    // 1. SIMPAN KE LOCALSTORAGE (Riwayat Lokal di Perangkat Siswa)
     const hasilBaru = {
         nama: dataSiswa.nama,
         kelas: dataSiswa.kelas,
@@ -1062,8 +1070,7 @@ function selesaikanKuis() {
     dataRekap.push(hasilBaru);
     localStorage.setItem('dataKuis', JSON.stringify(dataRekap));
 
-    // 2. KIRIM DATA KE GOOGLE SHEETS GURU
-    // Ganti teks di bawah ini dengan URL Web App dari Google Apps Script Bapak
+    // Endpoint App Script Bapak
     const scriptURL = 'https://script.google.com/macros/s/AKfycbwzCsI_5uv5jreQHSiNW5Dej7Iu-5Sui0uYhwIWGFwcsm8kM09C20JMwjDO8ZZRMGAs/exec'; 
     
     const payload = {
@@ -1078,28 +1085,22 @@ function selesaikanKuis() {
         body: JSON.stringify(payload)
     })
     .then(response => {
-        // Jika sukses terkirim, tampilkan layar hasil
         tampilkanLayarHasilAkhir(finalScore);
     })
     .catch(error => {
-        // Jika internet siswa bermasalah, tetap tampilkan layar hasil
         console.error("Gagal mengirim ke server guru:", error);
-        alert("Pemberitahuan: Skor Anda tersimpan di perangkat, namun koneksi ke server guru sedang terganggu.");
+        alert("Pemberitahuan: Skor Anda tersimpan di perangkat, namun koneksi ke server sedang terganggu.");
         tampilkanLayarHasilAkhir(finalScore);
     });
 }
 
-// Tambahkan fungsi bantuan ini tepat di bawah selesaikanKuis()
 function tampilkanLayarHasilAkhir(skor) {
-    // Pindah ke View Hasil
     document.getElementById('quiz-screen').classList.add('hidden');
     document.getElementById('headerHomeBtn').classList.add('hidden');
     document.getElementById('result-screen').classList.remove('hidden');
     
-    // Tampilkan skor besar
     document.getElementById('final-score').innerText = skor;
     
-    // Kembalikan status tombol
     const btnSelesai = document.getElementById('btn-next');
     btnSelesai.innerText = "Selesai Kuis";
     btnSelesai.disabled = false;
